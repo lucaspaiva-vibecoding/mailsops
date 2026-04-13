@@ -5,6 +5,8 @@ import { ListsGrid } from '../../components/contacts/ListsGrid'
 import { ContactsFilters } from '../../components/contacts/ContactsFilters'
 import { ContactsTable } from '../../components/contacts/ContactsTable'
 import { ContactDrawer } from '../../components/contacts/ContactDrawer'
+import { ImportWizardModal } from '../../components/contacts/ImportWizardModal'
+import { ImportHistoryModal } from '../../components/contacts/ImportHistoryModal'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useContacts } from '../../hooks/contacts/useContacts'
 import type { Contact } from '../../types/database'
@@ -19,6 +21,8 @@ export function ContactsPage() {
   const [page, setPage] = useState(1)
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [showNewContact, setShowNewContact] = useState(false)
+  const [showImportWizard, setShowImportWizard] = useState(false)
+  const [showImportHistory, setShowImportHistory] = useState(false)
 
   const activeListId = searchParams.get('list')
 
@@ -96,13 +100,13 @@ export function ContactsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="text-xl font-semibold text-gray-100">Contacts</h2>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => {}}>
+          <Button variant="ghost" size="sm" onClick={() => setShowImportHistory(true)}>
             View import history
           </Button>
           <Button variant="secondary" onClick={handleAddContact}>
             Add Contact
           </Button>
-          <Button variant="primary" onClick={() => {}}>
+          <Button variant="primary" onClick={() => setShowImportWizard(true)}>
             Import Contacts
           </Button>
         </div>
@@ -191,6 +195,22 @@ export function ContactsPage() {
           onDeleted={handleDrawerDeleted}
         />
       )}
+
+      {/* Import Wizard Modal */}
+      <ImportWizardModal
+        open={showImportWizard}
+        onClose={() => setShowImportWizard(false)}
+        onImportComplete={() => {
+          refetchContacts()
+          setShowImportWizard(false)
+        }}
+      />
+
+      {/* Import History Modal */}
+      <ImportHistoryModal
+        open={showImportHistory}
+        onClose={() => setShowImportHistory(false)}
+      />
     </div>
   )
 }
