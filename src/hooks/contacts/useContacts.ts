@@ -30,13 +30,16 @@ export function useContacts(filters: ContactFilters = {}) {
     setError(null)
 
     try {
-      // If filtering by list, first get contact IDs in that list
+      // If filtering by list, first get contact IDs in that list.
+      // NOTE: capped at 10,000 to avoid unbounded memory/request size.
+      // TODO: replace with a server-side subquery filter when PostgREST supports it.
       let listContactIds: string[] | null = null
       if (filters.listId) {
         const { data: members } = await supabase
           .from('contact_list_members')
           .select('contact_id')
           .eq('contact_list_id', filters.listId)
+          .limit(10000)
         listContactIds = (members ?? []).map((m: { contact_id: string }) => m.contact_id)
         if (listContactIds.length === 0) {
           setContacts([])
