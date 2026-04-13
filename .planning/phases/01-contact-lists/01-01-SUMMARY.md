@@ -39,7 +39,7 @@ patterns-established:
   - "RLS join-through: when a table lacks workspace_id, use subquery IN (SELECT id FROM parent_table WHERE workspace_id = ...)"
   - "Denormalized counter trigger: AFTER INSERT/DELETE on join table, UPDATE parent SET count = count +/- 1"
 
-requirements-completed: []  # Pending Task 2 (human-action): migrations must be applied to Supabase before requirements are live
+requirements-completed: [CONT-04, LIST-03, LIST-04, LIST-05]
 
 # Metrics
 duration: ~5min
@@ -55,7 +55,7 @@ completed: 2026-04-13
 - **Duration:** ~5 min
 - **Started:** 2026-04-13T04:11:27Z
 - **Completed:** 2026-04-13T04:16:00Z
-- **Tasks:** 1 of 2 complete (Task 2 awaiting human action)
+- **Tasks:** 2 of 2 complete
 - **Files modified:** 5
 
 ## Accomplishments
@@ -70,7 +70,7 @@ completed: 2026-04-13
 Each task was committed atomically:
 
 1. **Task 1: Create migration SQL files and install papaparse** - `2cdd906` (feat)
-2. **Task 2: Apply migrations to Supabase** - PENDING (human-action checkpoint)
+2. **Task 2: Apply migrations to Supabase** - CONFIRMED by user ("migrations applied")
 
 ## Files Created/Modified
 
@@ -94,26 +94,20 @@ None — plan executed exactly as written.
 
 None. All three migration files were created per specification. Grep verification of multi-line SQL patterns required using partial pattern matching (the acceptance criteria check `workspace_id = (SELECT workspace_id FROM public.profiles WHERE id = auth.uid())` spans two lines in the file — verified with partial pattern `workspace_id FROM public.profiles WHERE id = auth.uid` which matched 3 times as expected).
 
-## User Setup Required
+## User Setup Completed
 
-**Migrations must be applied manually to Supabase.** Task 2 is a `checkpoint:human-action` requiring the user to run the three SQL files in the Supabase Dashboard SQL Editor:
+All three SQL migration files were applied to Supabase by the user on 2026-04-13. Confirmed via user message: "migrations applied".
 
-1. Open Supabase Dashboard > SQL Editor
-2. Paste and run `supabase/migrations/001_contact_import_logs.sql`
-3. Paste and run `supabase/migrations/002_contact_list_count_trigger.sql`
-4. Paste and run `supabase/migrations/003_contact_list_members_rls.sql`
-5. Verify in Table Editor: `contact_import_logs` table exists
-6. Verify in Database > Functions: `update_contact_list_count` function exists
-7. Verify in Authentication > Policies: `contact_list_members` has 3 policies (SELECT, INSERT, DELETE)
-
-Type `"migrations applied"` to resume execution after all three files have been run successfully.
+- `001_contact_import_logs.sql` — applied
+- `002_contact_list_count_trigger.sql` — applied
+- `003_contact_list_members_rls.sql` — applied
 
 ## Next Phase Readiness
 
-- Migration files are ready to apply — papaparse is installed and importable
-- Once Task 2 (human action) is complete, all requirements CONT-04, LIST-03, LIST-04, LIST-05 will be unblocked
-- Plan 01-02 (TypeScript types and data hooks) can proceed immediately after migrations are applied
+- All migrations are live in Supabase — papaparse is installed and importable
+- Requirements CONT-04, LIST-03, LIST-04, LIST-05 are now unblocked
+- Plan 01-02 (TypeScript types and data hooks) can proceed immediately
 
 ---
 *Phase: 01-contact-lists*
-*Completed: 2026-04-13 (Task 2 pending human action)*
+*Completed: 2026-04-13*
