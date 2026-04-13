@@ -235,6 +235,8 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
     const toUpdate: { id: string; data: Partial<ContactInsert> }[] = []
     let skipped = 0
     let errors = 0
+    let insertedCount = 0
+    let updatedCount = 0
     const errorDetails: Array<{ row: number; reason: string }> = []
 
     // 2. Route each row to insert, update, or skip
@@ -282,6 +284,8 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
       if (error) {
         errors += chunk.length
         errorDetails.push({ row: 0, reason: `Batch insert error: ${error.message}` })
+      } else {
+        insertedCount += chunk.length
       }
       if (total > 0) {
         setProgress(Math.round(((i + chunk.length) / total) * 100))
@@ -295,6 +299,8 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
       if (error) {
         errors++
         errorDetails.push({ row: 0, reason: `Update error: ${error.message}` })
+      } else {
+        updatedCount++
       }
       if (total > 0) {
         setProgress(Math.round(((toInsert.length + i + 1) / total) * 100))
@@ -305,14 +311,14 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
     await supabase.from('contact_import_logs').insert({
       workspace_id: workspaceId,
       total_rows: csvRows.length,
-      imported: toInsert.length - Math.max(0, errors - toUpdate.length),
-      updated: toUpdate.length,
+      imported: insertedCount,
+      updated: updatedCount,
       skipped,
       errors,
       error_details: errorDetails,
     })
 
-    setImportResult({ imported: toInsert.length, updated: toUpdate.length, skipped, errors })
+    setImportResult({ imported: insertedCount, updated: updatedCount, skipped, errors })
     setImporting(false)
 
     if (errors === 0 || toInsert.length > 0 || toUpdate.length > 0) {
