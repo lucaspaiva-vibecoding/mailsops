@@ -715,29 +715,24 @@ setSearchParams({})
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
 | A1 | Fetching all existing emails upfront (for duplicate check) is acceptable for MVP workspace sizes | Pattern 4 | If workspace has 100K+ contacts, initial fetch may be slow or hit Supabase response size limits. Mitigation: add `.limit(10000)` and warn user if exceeded. |
-| A2 | Two-step list member query (fetch IDs then `.in()`) works correctly with RLS on `contact_list_members` | Pattern 3 | If RLS on contact_list_members blocks the join, the list view will be empty. May need to verify RLS policy covers `FOR SELECT` on that table. |
+| A2 | Two-step list member query (fetch IDs then `.in()`) works correctly with RLS on `contact_list_members` | Pattern 3 | RESOLVED: Plan 01 migration 003 creates explicit SELECT/INSERT/DELETE RLS policies on contact_list_members, scoped through contact_lists.workspace_id. The two-step query will work correctly. |
 | A3 | `Papa.parse(file, { header: false, skipEmptyLines: true })` returns first row as headers | Pattern 6 | If file has BOM or encoding issues, results.data[0] may not be headers. PapaParse handles BOM automatically, but test with real CSVs. |
 | A4 | `.contains('custom_fields', { key: value })` works for all JSONB value types | Pattern 3 | JSONB contains checks for exact value match including type. Numeric values stored as strings will not match integer searches. For MVP, document that custom field values are compared as strings. |
 | A5 | User input in `.or()` PostgREST filter string needs minimal escaping for MVP | Pitfall 7 | Special characters in search box could break queries. Safe for alphanumeric search; add trim() guard. |
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **contact_list_members RLS policy scope**
-   - What we know: RLS is enabled on `contact_list_members` (per schema-v1.md)
-   - What's unclear: The schema shows the RLS pattern for `contacts` but not the exact policy for `contact_list_members`. The policy should use `workspace_id` — but `contact_list_members` has no `workspace_id` column, only `contact_list_id`.
-   - Recommendation: In Wave 0, verify the actual RLS policy on `contact_list_members` in the live Supabase project. If missing or using a wrong column, add a policy that joins through `contact_lists.workspace_id`.
+1. **contact_list_members RLS policy scope** -- RESOLVED
+   - What we know: RLS is enabled on `contact_list_members` (per schema-v1.md) but schema-v1.md only shows the policy pattern for tables with `workspace_id` columns. `contact_list_members` has no `workspace_id` column.
+   - Resolution: Plan 01 now includes `supabase/migrations/003_contact_list_members_rls.sql` which creates explicit SELECT, INSERT, and DELETE policies on `contact_list_members`. These policies scope access by joining through `contact_lists.workspace_id` using a subquery: `contact_list_id IN (SELECT id FROM contact_lists WHERE workspace_id = (SELECT workspace_id FROM profiles WHERE id = auth.uid()))`. This ensures LIST-03 (add/remove) and LIST-04 (view list members) work correctly through RLS.
 
-2. **Supabase project version / email fetch limit**
-   - What we know: Project uses `@supabase/supabase-js` 2.49.4; latest is 2.103.0
-   - What's unclear: Whether any breaking changes between 2.49.4 and 2.103.0 affect the APIs used here
-   - Recommendation: The APIs used (`.from().select/insert/update/upsert/contains/or/ilike`) are stable across this version range. No upgrade required for this phase.
+2. **Supabase project version / email fetch limit** -- RESOLVED (no action needed)
+   - Resolution: The APIs used (`.from().select/insert/update/upsert/contains/or/ilike`) are stable across 2.49.4 to 2.103.0. No upgrade required for this phase. Verified via npm registry and Supabase changelog.
 
-3. **Pagination strategy for contacts table**
-   - What we know: No pagination is currently mentioned in requirements or UX decisions
-   - What's unclear: Whether to use cursor-based pagination, offset pagination, or infinite scroll
-   - Recommendation: Use simple `.range(from, to)` offset pagination for MVP. Display 50 contacts per page with Previous/Next controls. Flag for UX decision if not already covered.
+3. **Pagination strategy for contacts table** -- RESOLVED (deferred to implementation)
+   - Resolution: Use simple `.range(from, to)` offset pagination for MVP. Display 50 contacts per page with Previous/Next controls. This is handled at the component level in Plan 03 (ContactsTable) and does not require a research decision.
 
 ---
 
