@@ -55,11 +55,11 @@ Source: extracted from existing components (Input, Button, Badge, Sidebar, Card)
 | Role | Size | Weight | Line Height | Tailwind class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.4 | `text-sm font-medium` |
-| Heading | 16px | 700 (bold) | 1.3 | `text-base font-bold` |
-| Display | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` (page section headings) |
+| Label / Heading | 14–20px | 600 (semibold) | 1.2–1.4 | `text-sm font-semibold`, `text-base font-semibold`, `text-xl font-semibold` |
 
-Weights used: 400 (body, placeholder text), 500 (labels, nav items), 600 (section headings), 700 (brand mark only — "MailOps" in Sidebar). Executor must use only 400 and 500/600 in new components — 700 reserved for brand mark.
+**Declared weights: 400 and 600 only.** Use `font-normal` (400) for body copy, placeholder text, and secondary descriptions. Use `font-semibold` (600) for labels, nav items, table headers, section headings, and page titles.
+
+> **Footnote — brand mark exception:** The "MailOps" wordmark in the Sidebar uses `font-bold` (700). This is a pre-existing brand-mark token. Do NOT use weight 700 in any new component built for this phase.
 
 Sizes used: 12px (`text-xs` — Badge only), 14px (`text-sm` — body, labels, inputs, buttons), 16px (`text-base` — heading, logo), 20px (`text-xl` — page section titles). Do not introduce new sizes.
 
@@ -139,6 +139,12 @@ New components to build for Phase 1 (file names follow PascalCase + component co
 
 ---
 
+## Focal Point
+
+**Primary visual anchor:** the contacts table, with "Import Contacts" as the dominant CTA in the page header. The table occupies the full content width and is the first element a user scans after landing on `/contacts`. The page header (title + CTA row) is always visible above the fold.
+
+---
+
 ## Interaction Contracts
 
 ### Tab Navigation (D-01 to D-05)
@@ -161,7 +167,7 @@ New components to build for Phase 1 (file names follow PascalCase + component co
 - Pagination: 50 rows per page, Previous/Next controls below table, page indicator "Page 1 of N"
 - Pagination controls: `Button variant="secondary" size="sm"` for Previous/Next
 - Empty table cell text: `text-gray-500 text-sm`
-- Table header: `text-xs font-medium text-gray-400 uppercase tracking-wide bg-gray-900 border-b border-gray-800`
+- Table header: `text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-900 border-b border-gray-800`
 
 ### Filter Bar (CONT-06 to CONT-09)
 
@@ -184,8 +190,8 @@ New components to build for Phase 1 (file names follow PascalCase + component co
 - Close button: `Button variant="ghost" size="sm"` with `X` Lucide icon
 - Body: `p-4 flex flex-col gap-4 overflow-y-auto`
 - Sections within drawer: Contact Fields | List Membership | Danger Zone
-- Section headings: `text-xs font-medium text-gray-400 uppercase tracking-wide mb-2`
-- Edit inline: fields are read-only by default; "Edit" button toggles to editable `Input` components; "Save" / "Cancel" replace "Edit"
+- Section headings: `text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2`
+- Edit inline: fields are read-only by default; "Edit" button toggles to editable `Input` components; "Save changes" / "Discard changes" replace "Edit"
 - Delete action: in "Danger Zone" section at drawer bottom; `Button variant="danger" size="sm"` labeled "Delete Contact"
 
 ### CSV Import Wizard (D-10 to D-17)
@@ -206,7 +212,7 @@ New components to build for Phase 1 (file names follow PascalCase + component co
 
 - Layout: `grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4`
 - List card: `Card padding="sm"` with left color bar (4px wide, `rounded-l-lg`, color from preset palette)
-- Card content: list name (`text-sm font-semibold text-gray-100`) + description (`text-xs text-gray-400 mt-0.5`) + contact count (`text-xl font-bold text-gray-100 mt-3`) + "contacts" label (`text-xs text-gray-500`)
+- Card content: list name (`text-sm font-semibold text-gray-100`) + description (`text-xs text-gray-400 mt-0.5`) + contact count (`text-xl font-semibold text-gray-100 mt-3`) + "contacts" label (`text-xs text-gray-500`)
 - Card actions (top-right): `...` menu button (`Button variant="ghost" size="sm"`) revealing "Rename" and "Delete list" options
 - Clicking a list card navigates to `/contacts?list=<id>` — shows filtered contacts view
 - "New List" card: dashed border card `border-2 border-dashed border-gray-700 rounded-lg p-4 flex items-center justify-center gap-2 text-gray-400 hover:border-indigo-500 hover:text-indigo-400 cursor-pointer transition-colors`; Plus icon + "New List" label
@@ -225,12 +231,12 @@ New components to build for Phase 1 (file names follow PascalCase + component co
 - Modal: `bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4`
 - Content: scrollable list of past import records; each row shows: date (relative, e.g. "2 days ago"), total rows, imported, skipped, errors counts; columns use `text-sm text-gray-200` for numbers, `text-xs text-gray-500` for labels
 - Error detail: if row has errors > 0, expandable chevron reveals error details list (`text-xs text-red-400`)
-- Empty state: "No imports yet" centered with Upload icon in `text-gray-600`
+- Empty state: "No imports yet" centered with Upload icon in `text-gray-600`; body copy: "Your past CSV imports will appear here with row counts and any error details."
 
 ### Filtered List View (D-04, D-05, LIST-04)
 
 - When `/contacts?list=<id>` is active: Lists tab is highlighted; above the contacts table a breadcrumb strip shows: colored dot (list color) + list name + "All Contacts" link to clear filter
-- Breadcrumb strip: `flex items-center gap-2 mb-4 text-sm`; list name `text-gray-100 font-medium`; "All Contacts" link `text-indigo-400 hover:text-indigo-300`; separator `text-gray-600 /`
+- Breadcrumb strip: `flex items-center gap-2 mb-4 text-sm`; list name `text-gray-100 font-semibold`; "All Contacts" link `text-indigo-400 hover:text-indigo-300`; separator `text-gray-600 /`
 - The contacts table renders normally but scoped to list members only
 
 ---
@@ -262,7 +268,8 @@ Source: requirements, CONTEXT.md, phase goals. All copy is final — do not para
 | Empty state body (list empty) | "Add contacts to this list from the All Contacts view or by importing a CSV." |
 | Empty state heading (no lists) | "No lists yet" |
 | Empty state body (no lists) | "Create a list to organize your contacts for targeting campaigns." |
-| Import history empty state | "No imports yet" |
+| Import history empty state heading | "No imports yet" |
+| Import history empty state body | "Your past CSV imports will appear here with row counts and any error details." |
 | Wizard step 1 title | "Upload CSV" |
 | Wizard step 1 instruction | "Drop a CSV file or click to browse" |
 | Wizard step 1 file constraint | "Accepts .csv files only" |
@@ -283,7 +290,7 @@ Source: requirements, CONTEXT.md, phase goals. All copy is final — do not para
 | Wizard error message | "Import failed. {N} rows had errors. Review and try again." |
 | Drawer edit button | "Edit" |
 | Drawer save button | "Save changes" |
-| Drawer cancel button | "Cancel" |
+| Drawer cancel button | "Discard changes" |
 | Drawer delete button | "Delete Contact" |
 | Delete contact confirmation | "Are you sure you want to delete {first_name}? This cannot be undone." |
 | Delete contact confirm button | "Yes, delete contact" |
@@ -291,6 +298,7 @@ Source: requirements, CONTEXT.md, phase goals. All copy is final — do not para
 | Delete list button | "Delete list" |
 | Delete list confirmation | "Delete '{list_name}'? This will remove the list but not the contacts in it." |
 | Delete list confirm button | "Yes, delete list" |
+| Create List modal validation error | "List name is required." |
 | Toast: import success | "Contacts imported successfully." |
 | Toast: import error | "Import failed. Check your CSV and try again." |
 | Toast: contact created | "Contact added." |
@@ -341,6 +349,8 @@ Each component must handle all applicable states:
 - Contact status badges must not rely on color alone — Badge text always included (`active`, `unsubscribed`, `bounced`)
 - Wizard step progress must have `aria-label="Step N of 4: {step name}"` on active step
 - Delete confirmation must be announced via `aria-live="polite"` region
+- X close button on drawer and modals: `aria-label="Close"`
+- List card options menu button: `aria-label="List options"`
 
 ---
 
