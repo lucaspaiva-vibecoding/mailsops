@@ -76,10 +76,10 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — DB migrations (campaign_recipients + tracking_events), TypeScript types, config.toml, schema push
-- [ ] 03-02-PLAN.md — Tracking Edge Function `t` (Hono router: pixel/click/unsub endpoints)
-- [ ] 03-03-PLAN.md — send-campaign Edge Function (batch Resend sends with tracking injection + personalization)
-- [ ] 03-04-PLAN.md — resend-webhook Edge Function (Svix signature verification + delivery status updates)
+- [x] 03-01-PLAN.md — DB migrations (campaign_recipients + tracking_events), TypeScript types, config.toml, schema push
+- [x] 03-02-PLAN.md — Tracking Edge Function `t` (Hono router: pixel/click/unsub endpoints)
+- [x] 03-03-PLAN.md — send-campaign Edge Function (batch Resend sends with tracking injection + personalization)
+- [x] 03-04-PLAN.md — resend-webhook Edge Function (Svix signature verification + delivery status updates)
 - [ ] 03-05-PLAN.md — Frontend integration (sendCampaign hook + CampaignBuilderPage send flow + E2E verification)
 
 ### Phase 4: Analytics & Dashboard
@@ -91,7 +91,13 @@ Plans:
   2. User can explore a chronological event timeline for any campaign
   3. User can see per-link click counts and unique clicks, and drill into per-recipient engagement
   4. The dashboard displays total contacts, total campaigns sent, average open rate, recent campaigns, and list/unsubscribe counts
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Fix database.ts types + analytics utility helpers + useCampaignAnalytics and useDashboardStats hooks
+- [ ] 04-02-PLAN.md — Campaign Analytics Page: StatCard, EventTimeline, LinkBreakdown, RecipientTable components
+- [ ] 04-03-PLAN.md — Dashboard live data + recent campaigns table + analytics route wiring + View analytics action
+
 **UI hint**: yes
 
 ### Phase 5: A/B Testing
@@ -140,7 +146,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Contact Lists | 5/5 | Complete |  |
 | 2. Campaign Builder | 2/4 | In Progress|  |
 | 3. Email Delivery Engine | 0/5 | Not started | - |
-| 4. Analytics & Dashboard | 0/? | Not started | - |
+| 4. Analytics & Dashboard | 0/3 | Not started | - |
 | 5. A/B Testing | 0/? | Not started | - |
 | 6. Sequences | 0/? | Not started | - |
 | 7. Templates & Settings | 0/? | Not started | - |
