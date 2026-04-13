@@ -93,6 +93,10 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0]
     if (!selected) return
+    if (!selected.name.toLowerCase().endsWith('.csv')) {
+      setParseError('Please upload a .csv file only.')
+      return
+    }
     setFile(selected)
     setParseError(null)
 
