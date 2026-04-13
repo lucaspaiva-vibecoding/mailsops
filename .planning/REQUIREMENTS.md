@@ -50,16 +50,16 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 ### Analytics & Metrics (Module 5)
 
-- [ ] **ANLX-01**: User can view per-campaign summary stats (sent, delivered, open rate, click rate, bounce rate, unsubscribe rate)
-- [ ] **ANLX-02**: User can see a chronological event timeline for a campaign
-- [ ] **ANLX-03**: User can see per-link click breakdown with click count and unique clicks
-- [ ] **ANLX-04**: User can see per-recipient engagement — who opened, clicked, bounced, or unsubscribed
+- [x] **ANLX-01**: User can view per-campaign summary stats (sent, delivered, open rate, click rate, bounce rate, unsubscribe rate)
+- [x] **ANLX-02**: User can see a chronological event timeline for a campaign
+- [x] **ANLX-03**: User can see per-link click breakdown with click count and unique clicks
+- [x] **ANLX-04**: User can see per-recipient engagement — who opened, clicked, bounced, or unsubscribed
 
 ### Dashboard (Module 6)
 
-- [ ] **DASH-01**: User sees account-wide summary stats: total contacts, total campaigns sent, average open rate
-- [ ] **DASH-02**: User sees a list of recent campaigns with name, status, sent date, and open/click rates
-- [ ] **DASH-03**: User sees total number of contact lists and unsubscribe count
+- [x] **DASH-01**: User sees account-wide summary stats: total contacts, total campaigns sent, average open rate
+- [x] **DASH-02**: User sees a list of recent campaigns with name, status, sent date, and open/click rates
+- [x] **DASH-03**: User sees total number of contact lists and unsubscribe count
 
 ### A/B Testing (Module 7)
 
@@ -163,13 +163,13 @@ Deferred — not in current roadmap.
 | DELV-05 | Phase 3 — Email Delivery Engine | Pending |
 | DELV-06 | Phase 3 — Email Delivery Engine | Pending |
 | DELV-07 | Phase 3 — Email Delivery Engine | Pending |
-| ANLX-01 | Phase 4 — Analytics & Dashboard | Pending |
-| ANLX-02 | Phase 4 — Analytics & Dashboard | Pending |
-| ANLX-03 | Phase 4 — Analytics & Dashboard | Pending |
-| ANLX-04 | Phase 4 — Analytics & Dashboard | Pending |
-| DASH-01 | Phase 4 — Analytics & Dashboard | Pending |
-| DASH-02 | Phase 4 — Analytics & Dashboard | Pending |
-| DASH-03 | Phase 4 — Analytics & Dashboard | Pending |
+| ANLX-01 | Phase 4 — Analytics & Dashboard | Complete |
+| ANLX-02 | Phase 4 — Analytics & Dashboard | Complete |
+| ANLX-03 | Phase 4 — Analytics & Dashboard | Complete |
+| ANLX-04 | Phase 4 — Analytics & Dashboard | Complete |
+| DASH-01 | Phase 4 — Analytics & Dashboard | Complete |
+| DASH-02 | Phase 4 — Analytics & Dashboard | Complete |
+| DASH-03 | Phase 4 — Analytics & Dashboard | Complete |
 | ABTS-01 | Phase 5 — A/B Testing | Pending |
 | ABTS-02 | Phase 5 — A/B Testing | Pending |
 | ABTS-03 | Phase 5 — A/B Testing | Pending |
