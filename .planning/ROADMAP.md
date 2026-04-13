@@ -1,0 +1,124 @@
+# Roadmap: MailOps
+
+## Overview
+
+MailOps builds outward from its core: contacts exist, campaigns get built, emails go out, results get measured. Each phase delivers a complete, usable capability — starting with the contact foundation (Module 2), layering the campaign builder and delivery engine (Modules 3–4), then adding analytics, A/B testing, sequences, and finally templates and settings (Modules 5–10). Auth (Module 1) is already shipped.
+
+## Phases
+
+**Phase Numbering:**
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+
+Decimal phases appear between their surrounding integers in numeric order.
+
+- [ ] **Phase 1: Contact Lists** - Upload contacts via CSV, manage individual contacts, and organize them into named lists
+- [ ] **Phase 2: Campaign Builder** - Create campaigns with TipTap editor, personalization variables, scheduling, and test sends
+- [ ] **Phase 3: Email Delivery Engine** - Send campaigns via Resend API with open/click/unsubscribe tracking via Edge Functions
+- [ ] **Phase 4: Analytics & Dashboard** - Per-campaign analytics, event timeline, link breakdown, recipient engagement, and account-wide dashboard
+- [ ] **Phase 5: A/B Testing** - Create variant campaigns, set split percentages, compare results, and send the winning variant
+- [ ] **Phase 6: Sequences** - Build multi-step drip campaigns with time-based delays and per-step delivery stats
+- [ ] **Phase 7: Templates & Settings** - Save reusable templates from campaigns and configure workspace/Resend settings
+
+## Phase Details
+
+### Phase 1: Contact Lists
+**Goal**: Users can import, manage, and organize contacts into lists ready for campaign targeting
+**Depends on**: Nothing (Module 1 Auth already shipped)
+**Requirements**: CONT-01, CONT-02, CONT-03, CONT-04, CONT-05, CONT-06, CONT-07, CONT-08, CONT-09, LIST-01, LIST-02, LIST-03, LIST-04, LIST-05
+**Success Criteria** (what must be TRUE):
+  1. User can upload a CSV, map columns to contact fields, and see the imported contacts appear in their account
+  2. User can manually create, edit, and delete individual contacts
+  3. User can search and filter contacts by email, name, tag, status, or custom field value
+  4. User can create and manage named contact lists and add or remove contacts from them
+  5. Contact list pages display accurate contact counts
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 2: Campaign Builder
+**Goal**: Users can build a complete email campaign — content, sender settings, targeting, and scheduling — before it is sent
+**Depends on**: Phase 1
+**Requirements**: CAMP-01, CAMP-02, CAMP-03, CAMP-04, CAMP-05, CAMP-06, CAMP-07, CAMP-08
+**Success Criteria** (what must be TRUE):
+  1. User can create a campaign with name, subject, preview text, sender name, and sender email
+  2. User can compose the email body using the TipTap rich text editor with personalization variables
+  3. User can select a contact list as the campaign target and schedule it for future delivery
+  4. User can send a test email to themselves before launching
+  5. User can save drafts, return to edit them, and duplicate existing campaigns
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 3: Email Delivery Engine
+**Goal**: Users can launch a campaign and emails are sent, tracked, and status-updated automatically
+**Depends on**: Phase 2
+**Requirements**: DELV-01, DELV-02, DELV-03, DELV-04, DELV-05, DELV-06, DELV-07
+**Success Criteria** (what must be TRUE):
+  1. User can send a campaign and all active contacts in the target list receive the email via Resend API
+  2. Every sent email contains a tracking pixel and wrapped click-redirect URLs
+  3. Opens are recorded in the database when the pixel loads in an email client
+  4. Clicks are recorded and the recipient is redirected to the original URL
+  5. Contacts who click the unsubscribe link are automatically marked unsubscribed; bounces are reflected via Resend webhooks
+**Plans**: TBD
+
+### Phase 4: Analytics & Dashboard
+**Goal**: Users can see exactly how each campaign performed and get an account-wide overview on the dashboard
+**Depends on**: Phase 3
+**Requirements**: ANLX-01, ANLX-02, ANLX-03, ANLX-04, DASH-01, DASH-02, DASH-03
+**Success Criteria** (what must be TRUE):
+  1. User can view per-campaign summary stats: sent, delivered, open rate, click rate, bounce rate, unsubscribe rate
+  2. User can explore a chronological event timeline for any campaign
+  3. User can see per-link click counts and unique clicks, and drill into per-recipient engagement
+  4. The dashboard displays total contacts, total campaigns sent, average open rate, recent campaigns, and list/unsubscribe counts
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: A/B Testing
+**Goal**: Users can test two email variants against part of a list, compare results, and send the winner to the rest
+**Depends on**: Phase 3
+**Requirements**: ABTS-01, ABTS-02, ABTS-03, ABTS-04
+**Success Criteria** (what must be TRUE):
+  1. User can create an A/B test campaign with two variants (different subject lines and/or bodies)
+  2. User can set the split percentage between variants before sending
+  3. User can view open rate and click rate side-by-side for each variant
+  4. User can pick a winning variant and send it to the remaining unsent contacts
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: Sequences
+**Goal**: Users can automate multi-step email follow-up sequences that send on a time-based schedule
+**Depends on**: Phase 3
+**Requirements**: SEQN-01, SEQN-02, SEQN-03, SEQN-04
+**Success Criteria** (what must be TRUE):
+  1. User can create a sequence with multiple steps, each with its own subject, body, and delay (e.g., Day 1, Day 3, Day 7)
+  2. User can assign a contact list to a sequence to enroll all active contacts
+  3. Sequence steps are sent automatically after their configured delay without manual action
+  4. User can view enrollment count per sequence and delivery/open stats per step
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 7: Templates & Settings
+**Goal**: Users can save reusable email templates and configure their workspace and Resend integration
+**Depends on**: Phase 2
+**Requirements**: TMPL-01, TMPL-02, TMPL-03, TMPL-04, SETT-01, SETT-02, SETT-03, SETT-04
+**Success Criteria** (what must be TRUE):
+  1. User can save any campaign as a template and browse saved templates with name and preview
+  2. User can start a new campaign pre-filled from a saved template, and delete templates they no longer need
+  3. User can update workspace settings: company name, timezone, default sender name and email
+  4. User can save their Resend API key and configure the unsubscribe footer text for all outgoing emails
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Contact Lists | 0/? | Not started | - |
+| 2. Campaign Builder | 0/? | Not started | - |
+| 3. Email Delivery Engine | 0/? | Not started | - |
+| 4. Analytics & Dashboard | 0/? | Not started | - |
+| 5. A/B Testing | 0/? | Not started | - |
+| 6. Sequences | 0/? | Not started | - |
+| 7. Templates & Settings | 0/? | Not started | - |

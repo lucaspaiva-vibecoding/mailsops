@@ -132,26 +132,66 @@ Deferred — not in current roadmap.
 
 ## Traceability
 
-Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONT-01–09  | TBD   | Pending |
-| LIST-01–05  | TBD   | Pending |
-| CAMP-01–08  | TBD   | Pending |
-| DELV-01–07  | TBD   | Pending |
-| ANLX-01–04  | TBD   | Pending |
-| DASH-01–03  | TBD   | Pending |
-| ABTS-01–04  | TBD   | Pending |
-| SEQN-01–04  | TBD   | Pending |
-| TMPL-01–04  | TBD   | Pending |
-| SETT-01–04  | TBD   | Pending |
+| CONT-01 | Phase 1 — Contact Lists | Pending |
+| CONT-02 | Phase 1 — Contact Lists | Pending |
+| CONT-03 | Phase 1 — Contact Lists | Pending |
+| CONT-04 | Phase 1 — Contact Lists | Pending |
+| CONT-05 | Phase 1 — Contact Lists | Pending |
+| CONT-06 | Phase 1 — Contact Lists | Pending |
+| CONT-07 | Phase 1 — Contact Lists | Pending |
+| CONT-08 | Phase 1 — Contact Lists | Pending |
+| CONT-09 | Phase 1 — Contact Lists | Pending |
+| LIST-01 | Phase 1 — Contact Lists | Pending |
+| LIST-02 | Phase 1 — Contact Lists | Pending |
+| LIST-03 | Phase 1 — Contact Lists | Pending |
+| LIST-04 | Phase 1 — Contact Lists | Pending |
+| LIST-05 | Phase 1 — Contact Lists | Pending |
+| CAMP-01 | Phase 2 — Campaign Builder | Pending |
+| CAMP-02 | Phase 2 — Campaign Builder | Pending |
+| CAMP-03 | Phase 2 — Campaign Builder | Pending |
+| CAMP-04 | Phase 2 — Campaign Builder | Pending |
+| CAMP-05 | Phase 2 — Campaign Builder | Pending |
+| CAMP-06 | Phase 2 — Campaign Builder | Pending |
+| CAMP-07 | Phase 2 — Campaign Builder | Pending |
+| CAMP-08 | Phase 2 — Campaign Builder | Pending |
+| DELV-01 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-02 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-03 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-04 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-05 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-06 | Phase 3 — Email Delivery Engine | Pending |
+| DELV-07 | Phase 3 — Email Delivery Engine | Pending |
+| ANLX-01 | Phase 4 — Analytics & Dashboard | Pending |
+| ANLX-02 | Phase 4 — Analytics & Dashboard | Pending |
+| ANLX-03 | Phase 4 — Analytics & Dashboard | Pending |
+| ANLX-04 | Phase 4 — Analytics & Dashboard | Pending |
+| DASH-01 | Phase 4 — Analytics & Dashboard | Pending |
+| DASH-02 | Phase 4 — Analytics & Dashboard | Pending |
+| DASH-03 | Phase 4 — Analytics & Dashboard | Pending |
+| ABTS-01 | Phase 5 — A/B Testing | Pending |
+| ABTS-02 | Phase 5 — A/B Testing | Pending |
+| ABTS-03 | Phase 5 — A/B Testing | Pending |
+| ABTS-04 | Phase 5 — A/B Testing | Pending |
+| SEQN-01 | Phase 6 — Sequences | Pending |
+| SEQN-02 | Phase 6 — Sequences | Pending |
+| SEQN-03 | Phase 6 — Sequences | Pending |
+| SEQN-04 | Phase 6 — Sequences | Pending |
+| TMPL-01 | Phase 7 — Templates & Settings | Pending |
+| TMPL-02 | Phase 7 — Templates & Settings | Pending |
+| TMPL-03 | Phase 7 — Templates & Settings | Pending |
+| TMPL-04 | Phase 7 — Templates & Settings | Pending |
+| SETT-01 | Phase 7 — Templates & Settings | Pending |
+| SETT-02 | Phase 7 — Templates & Settings | Pending |
+| SETT-03 | Phase 7 — Templates & Settings | Pending |
+| SETT-04 | Phase 7 — Templates & Settings | Pending |
 
 **Coverage:**
 - v1 requirements: 49 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 49 ⚠️
+- Mapped to phases: 49
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-13 after initial definition*
+*Last updated: 2026-04-13 after roadmap creation*
