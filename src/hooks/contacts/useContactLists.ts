@@ -16,7 +16,7 @@ export function useContactLists() {
 
     const { data, error: fetchError } = await supabase
       .from('contact_lists')
-      .select('*')
+      .select('id, workspace_id, name, description, color, contact_count, created_at, updated_at, deleted_at')
       .eq('workspace_id', profile.workspace_id)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
