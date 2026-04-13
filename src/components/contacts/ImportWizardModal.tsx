@@ -173,6 +173,12 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
       setEmailMappingError(true)
       return
     }
+    const nonSkipMappings = columnMapping.filter((m) => m !== 'skip')
+    const hasDuplicateMappings = new Set(nonSkipMappings).size !== nonSkipMappings.length
+    if (hasDuplicateMappings) {
+      setEmailMappingError(true)
+      return
+    }
     setEmailMappingError(false)
     setPreviewLoading(true)
 
