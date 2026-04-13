@@ -589,17 +589,19 @@ import { CampaignAnalyticsPage } from './pages/campaigns/CampaignAnalyticsPage'
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **PostgREST join path for campaign_events → contacts**
+1. **PostgREST join path for campaign_events -> contacts**
    - What we know: `campaign_events` has `recipient_id` FK to `campaign_recipients`; `campaign_recipients` has `contact_id` FK to `contacts`
    - What's unclear: Whether PostgREST auto-resolves a two-hop join in a single `.select()` call
-   - Recommendation: Implement as two-step fetch to be safe (events → recipient IDs → contacts). If profiling shows this is too slow, denormalize `contact_id` onto `campaign_events` as an optimization.
+   - Recommendation: Implement as two-step fetch to be safe (events -> recipient IDs -> contacts). If profiling shows this is too slow, denormalize `contact_id` onto `campaign_events` as an optimization.
+   - RESOLVED: Two-step fetch approach adopted — see Plan 01 Task 2. Events are fetched first, then recipient_ids are collected, campaign_recipients queried for contact_ids, and contacts fetched separately. This avoids the PostgREST multi-hop join ambiguity entirely.
 
 2. **DASH-03 scope**
    - What we know: Requirement says "total contact lists and unsubscribe count"; user deferred unsubscribe count stat card from dashboard in favor of Avg Click Rate (D-06)
    - What's unclear: Should contact list count still appear on the dashboard (D-06 shows 4 specific cards: Contacts, Campaigns Sent, Avg Open Rate, Avg Click Rate — no list count card)
    - Recommendation: The 4 stat cards in D-06 are locked. For DASH-03, the contact list count and unsubscribe count data should be present somewhere visible — consider adding it as secondary text under existing cards, or accept partial requirement satisfaction since DASH-03 deferred unsubscribes to per-campaign view.
+   - RESOLVED: Data shown as secondary text under stat cards per D-06 constraints — see Plan 03 Task 1. The dashboard renders contact lists count and unsubscribed contacts count as a secondary info line below the 4 stat cards, satisfying DASH-03 without adding a 5th card that would conflict with D-06.
 
 ---
 
