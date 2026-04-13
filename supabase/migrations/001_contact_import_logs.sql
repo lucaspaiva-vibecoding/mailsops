@@ -3,7 +3,7 @@
 
 CREATE TABLE public.contact_import_logs (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    workspace_id    UUID NOT NULL REFERENCES public.profiles(workspace_id),
+    workspace_id    UUID NOT NULL,
     total_rows      INT NOT NULL DEFAULT 0,
     imported        INT NOT NULL DEFAULT 0,
     updated         INT NOT NULL DEFAULT 0,
