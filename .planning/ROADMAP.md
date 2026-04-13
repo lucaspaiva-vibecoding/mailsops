@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — DB migrations (import_logs table, contact_count trigger) + papaparse install
-- [ ] 01-02-PLAN.md — TypeScript type interfaces + useContacts/useContactLists data hooks
+- [x] 01-02-PLAN.md — TypeScript type interfaces + useContacts/useContactLists data hooks
 - [ ] 01-03-PLAN.md — ContactsPage shell with tabs + Lists tab (ListsGrid, CreateListModal, ColorPicker)
 - [ ] 01-04-PLAN.md — ContactsTable + ContactsFilters + ContactDrawer (CRUD + list membership)
 - [ ] 01-05-PLAN.md — CSV import wizard + import history modal

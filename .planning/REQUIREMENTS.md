@@ -13,19 +13,19 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 - [ ] **CONT-02**: CSV import handles duplicates — skip or update existing contacts by email
 - [ ] **CONT-03**: User can apply tags to all contacts during CSV import
 - [ ] **CONT-04**: User can view import history with row counts and error details
-- [ ] **CONT-05**: User can manually create, edit, and delete individual contacts
-- [ ] **CONT-06**: User can search contacts by email or name
-- [ ] **CONT-07**: User can filter contacts by tag
-- [ ] **CONT-08**: User can filter contacts by status (active, unsubscribed, bounced)
-- [ ] **CONT-09**: User can filter contacts by custom field values
+- [x] **CONT-05**: User can manually create, edit, and delete individual contacts
+- [x] **CONT-06**: User can search contacts by email or name
+- [x] **CONT-07**: User can filter contacts by tag
+- [x] **CONT-08**: User can filter contacts by status (active, unsubscribed, bounced)
+- [x] **CONT-09**: User can filter contacts by custom field values
 
 ### Contact Lists (Module 2)
 
-- [ ] **LIST-01**: User can create a contact list with name, description, and color
-- [ ] **LIST-02**: User can rename and delete contact lists
-- [ ] **LIST-03**: User can add and remove contacts from a list
-- [ ] **LIST-04**: User can view contacts within a specific list
-- [ ] **LIST-05**: Contact lists display contact count
+- [x] **LIST-01**: User can create a contact list with name, description, and color
+- [x] **LIST-02**: User can rename and delete contact lists
+- [x] **LIST-03**: User can add and remove contacts from a list
+- [x] **LIST-04**: User can view contacts within a specific list
+- [x] **LIST-05**: Contact lists display contact count
 
 ### Campaign Builder (Module 3)
 
@@ -138,16 +138,16 @@ Deferred — not in current roadmap.
 | CONT-02 | Phase 1 — Contact Lists | Pending |
 | CONT-03 | Phase 1 — Contact Lists | Pending |
 | CONT-04 | Phase 1 — Contact Lists | Pending |
-| CONT-05 | Phase 1 — Contact Lists | Pending |
-| CONT-06 | Phase 1 — Contact Lists | Pending |
-| CONT-07 | Phase 1 — Contact Lists | Pending |
-| CONT-08 | Phase 1 — Contact Lists | Pending |
-| CONT-09 | Phase 1 — Contact Lists | Pending |
-| LIST-01 | Phase 1 — Contact Lists | Pending |
-| LIST-02 | Phase 1 — Contact Lists | Pending |
-| LIST-03 | Phase 1 — Contact Lists | Pending |
-| LIST-04 | Phase 1 — Contact Lists | Pending |
-| LIST-05 | Phase 1 — Contact Lists | Pending |
+| CONT-05 | Phase 1 — Contact Lists | Complete |
+| CONT-06 | Phase 1 — Contact Lists | Complete |
+| CONT-07 | Phase 1 — Contact Lists | Complete |
+| CONT-08 | Phase 1 — Contact Lists | Complete |
+| CONT-09 | Phase 1 — Contact Lists | Complete |
+| LIST-01 | Phase 1 — Contact Lists | Complete |
+| LIST-02 | Phase 1 — Contact Lists | Complete |
+| LIST-03 | Phase 1 — Contact Lists | Complete |
+| LIST-04 | Phase 1 — Contact Lists | Complete |
+| LIST-05 | Phase 1 — Contact Lists | Complete |
 | CAMP-01 | Phase 2 — Campaign Builder | Pending |
 | CAMP-02 | Phase 2 — Campaign Builder | Pending |
 | CAMP-03 | Phase 2 — Campaign Builder | Pending |
