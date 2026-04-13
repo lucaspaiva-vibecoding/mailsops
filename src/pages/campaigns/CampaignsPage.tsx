@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, MoreHorizontal, Mail } from 'lucide-react'
+import { Plus, MoreHorizontal, Mail, Upload } from 'lucide-react'
 import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { Spinner } from '../../components/ui/Spinner'
+import { ImportCampaignsModal } from '../../components/campaigns/ImportCampaignsModal'
 import type { CampaignStatus } from '../../types/database'
 
 const statusBadgeVariant: Record<CampaignStatus, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
@@ -31,9 +32,10 @@ const statusLabel: Record<CampaignStatus, string> = {
 export function CampaignsPage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
-  const { campaigns, loading, deleteCampaign, duplicateCampaign } = useCampaigns()
+  const { campaigns, loading, refetch, deleteCampaign, duplicateCampaign } = useCampaigns()
   const { lists } = useContactLists()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [showImportModal, setShowImportModal] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   const listMap = Object.fromEntries(lists.map((l) => [l.id, l.name]))
@@ -83,10 +85,16 @@ export function CampaignsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-gray-100">Campaigns</h1>
-        <Button variant="primary" size="md" onClick={() => navigate('/campaigns/new')}>
-          <Plus size={16} />
-          New Campaign
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="md" onClick={() => setShowImportModal(true)}>
+            <Upload size={16} />
+            Import Campaigns
+          </Button>
+          <Button variant="primary" size="md" onClick={() => navigate('/campaigns/new')}>
+            <Plus size={16} />
+            New Campaign
+          </Button>
+        </div>
       </div>
 
       <Card padding="sm" className="overflow-hidden p-0">
@@ -168,6 +176,18 @@ export function CampaignsPage() {
                           ref={menuRef}
                           className="absolute right-4 top-full mt-1 z-20 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 min-w-[140px]"
                         >
+                          {campaign.status === 'sent' && (
+                            <button
+                              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setOpenMenuId(null)
+                                navigate(`/campaigns/${campaign.id}/analytics`)
+                              }}
+                            >
+                              View analytics
+                            </button>
+                          )}
                           <button
                             className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
                             onClick={(e) => {
@@ -206,6 +226,11 @@ export function CampaignsPage() {
           </div>
         )}
       </Card>
+      <ImportCampaignsModal
+        open={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={() => { setShowImportModal(false); refetch() }}
+      />
     </div>
   )
 }
