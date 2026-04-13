@@ -73,7 +73,14 @@ Plans:
   3. Opens are recorded in the database when the pixel loads in an email client
   4. Clicks are recorded and the recipient is redirected to the original URL
   5. Contacts who click the unsubscribe link are automatically marked unsubscribed; bounces are reflected via Resend webhooks
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — DB migrations (campaign_recipients + tracking_events), TypeScript types, config.toml, schema push
+- [ ] 03-02-PLAN.md — Tracking Edge Function `t` (Hono router: pixel/click/unsub endpoints)
+- [ ] 03-03-PLAN.md — send-campaign Edge Function (batch Resend sends with tracking injection + personalization)
+- [ ] 03-04-PLAN.md — resend-webhook Edge Function (Svix signature verification + delivery status updates)
+- [ ] 03-05-PLAN.md — Frontend integration (sendCampaign hook + CampaignBuilderPage send flow + E2E verification)
 
 ### Phase 4: Analytics & Dashboard
 **Goal**: Users can see exactly how each campaign performed and get an account-wide overview on the dashboard
@@ -132,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Contact Lists | 5/5 | Complete |  |
 | 2. Campaign Builder | 2/4 | In Progress|  |
-| 3. Email Delivery Engine | 0/? | Not started | - |
+| 3. Email Delivery Engine | 0/5 | Not started | - |
 | 4. Analytics & Dashboard | 0/? | Not started | - |
 | 5. A/B Testing | 0/? | Not started | - |
 | 6. Sequences | 0/? | Not started | - |
