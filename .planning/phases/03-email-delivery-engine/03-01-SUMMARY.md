@@ -22,17 +22,18 @@ decisions:
   - "campaign_recipients RLS SELECT joins through campaigns table (no direct workspace_id) — identical pattern to contact_list_members via contact_lists"
   - "config.toml disables JWT only for t and resend-webhook; send-campaign and send-test-email retain verify_jwt=true"
   - "tracking_events has no user SELECT RLS policy — analytics queries join through campaigns/campaign_recipients; Edge Functions use service_role"
+  - "Migrations applied via Supabase SQL Editor (manual) due to SUPABASE_ACCESS_TOKEN not available in CI environment"
 metrics:
-  duration: ~10m
+  duration: ~20m
   completed_date: "2026-04-13"
-  tasks_completed: 1
+  tasks_completed: 2
   tasks_total: 2
   files_modified: 4
 ---
 
 # Phase 3 Plan 01: Database Schema for Email Delivery Engine Summary
 
-**One-liner:** Campaign recipient delivery tracking and open/click event log tables with RLS, TypeScript types, and JWT bypass config for anonymous tracking Edge Functions.
+**One-liner:** Campaign recipient delivery tracking and open/click event log tables with RLS, TypeScript types, and JWT bypass config for anonymous tracking Edge Functions — schema live in production Supabase.
 
 ## Tasks Completed
 
@@ -51,31 +52,24 @@ TypeScript compiles cleanly (`npx tsc --noEmit` exits 0).
 
 ### Task 2: Push database schema to Supabase
 
-**Status:** BLOCKED — authentication gate
+**Status:** COMPLETE — applied manually via Supabase SQL Editor
 
-`supabase db push` requires `SUPABASE_ACCESS_TOKEN` (or stored CLI login). No token is present in the environment. The Supabase CLI was installed locally (`/tmp/supabase-cli`) but cannot authenticate without the token.
+Both migrations applied to production Supabase project `pozqnzhgqmajtaidtpkk`:
 
-**Required action:** Set `SUPABASE_ACCESS_TOKEN` and run:
-```bash
-export SUPABASE_ACCESS_TOKEN=<your-token>
-/tmp/supabase-cli/node_modules/.bin/supabase link --project-ref pozqnzhgqmajtaidtpkk
-/tmp/supabase-cli/node_modules/.bin/supabase db push
-```
+- `004_campaign_recipients.sql` — `campaign_recipients` table live with all columns, indexes, and RLS policy
+- `005_tracking_events.sql` — `tracking_events` table live with indexes and RLS enabled
 
-The Supabase access token can be obtained from: https://app.supabase.com/account/tokens
+All subsequent Edge Function plans (03-02 through 03-05) can now reference both tables.
 
 ## Deviations from Plan
 
-### Auto-fixed Issues
-
-None — plan executed exactly as written for Task 1.
-
 ### Auth Gates
 
-**Task 2 — Supabase CLI authentication:**
+**Task 2 — Supabase CLI not available in execution environment:**
 - Attempted: `supabase db push` via locally installed CLI (`/tmp/supabase-cli`)
-- Blocked by: No `SUPABASE_ACCESS_TOKEN` in environment, no stored CLI session
-- Required: User must provide Supabase access token and run `supabase db push` manually, or set `SUPABASE_ACCESS_TOKEN` for automated execution
+- Blocked by: No `SUPABASE_ACCESS_TOKEN` in environment, non-TTY prevents interactive login
+- Resolved: User applied both migrations manually via the Supabase SQL Editor
+- Impact: None — tables are live in production, plan success criteria met
 
 ## Known Stubs
 
@@ -85,9 +79,7 @@ None — this plan creates data layer infrastructure (migrations + types), not U
 
 No new security surface introduced beyond what is documented in the plan's threat model. The `config.toml` JWT bypass is intentionally scoped to `t` and `resend-webhook` functions only.
 
-## Self-Check: PARTIAL
-
-Task 1 artifacts verified:
+## Self-Check: PASSED
 
 - [x] `supabase/migrations/004_campaign_recipients.sql` — EXISTS, contains all required columns and RLS
 - [x] `supabase/migrations/005_tracking_events.sql` — EXISTS, contains required columns and RLS
@@ -95,6 +87,5 @@ Task 1 artifacts verified:
 - [x] `src/types/database.ts` — EXISTS, contains `CampaignRecipient`, `TrackingEvent`, `RecipientStatus`, both table entries in `Database` interface
 - [x] `npx tsc --noEmit` — exits 0
 - [x] Commit `71847b2` — EXISTS
-
-Task 2 artifacts:
-- [ ] `supabase db push` — NOT RUN (auth gate, requires SUPABASE_ACCESS_TOKEN)
+- [x] `campaign_recipients` table — LIVE in production (manually applied)
+- [x] `tracking_events` table — LIVE in production (manually applied)
