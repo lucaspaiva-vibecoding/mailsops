@@ -221,9 +221,13 @@ export function ImportWizardModal({ open, onClose, onImportComplete }: ImportWiz
   }
 
   async function executeImport() {
+    if (!profile?.workspace_id) {
+      showToast('Session expired. Please sign in again.', 'error')
+      return
+    }
     setImporting(true)
     setImportError(null)
-    const workspaceId = profile!.workspace_id
+    const workspaceId = profile.workspace_id
 
     // 1. Fetch all existing emails in workspace
     const { data: existing } = await supabase
