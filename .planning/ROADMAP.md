@@ -32,7 +32,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can search and filter contacts by email, name, tag, status, or custom field value
   4. User can create and manage named contact lists and add or remove contacts from them
   5. Contact list pages display accurate contact counts
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — DB migrations (import_logs table, contact_count trigger) + papaparse install
+- [ ] 01-02-PLAN.md — TypeScript type interfaces + useContacts/useContactLists data hooks
+- [ ] 01-03-PLAN.md — ContactsPage shell with tabs + Lists tab (ListsGrid, CreateListModal, ColorPicker)
+- [ ] 01-04-PLAN.md — ContactsTable + ContactsFilters + ContactDrawer (CRUD + list membership)
+- [ ] 01-05-PLAN.md — CSV import wizard + import history modal
+
 **UI hint**: yes
 
 ### Phase 2: Campaign Builder
@@ -115,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Contact Lists | 0/? | Not started | - |
+| 1. Contact Lists | 0/5 | Planning complete | - |
 | 2. Campaign Builder | 0/? | Not started | - |
 | 3. Email Delivery Engine | 0/? | Not started | - |
 | 4. Analytics & Dashboard | 0/? | Not started | - |
