@@ -642,22 +642,16 @@ if (error) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Campaign status enum mismatch**
-   - What we know: `schema-v1.md` defines `('draft', 'scheduled', 'sending', 'sent', 'paused', 'cancelled')`; CONTEXT.md D-20 lists `draft`, `scheduled`, `queued`, `sent`, `failed`
-   - What's unclear: Are `queued` and `failed` valid statuses in the live DB? The schema may not have been applied exactly as written, or the status enum may have been modified after schema creation.
-   - Recommendation: TypeScript types should use the schema's enum. The planner should add a note to verify against the live Supabase table definition before implementing status-setting logic. Map UI badge labels to whatever DB statuses are confirmed.
+1. **Campaign status enum mismatch** — RESOLVED
+   - **Resolution:** The database schema (`docs/schema-v1.md` Module 3) is the source of truth. The CHECK constraint defines: `('draft', 'scheduled', 'sending', 'sent', 'paused', 'cancelled')`. CONTEXT.md D-20 listed `queued` and `failed`, but these are NOT valid DB values — inserting them would violate the CHECK constraint. The TypeScript `CampaignStatus` type uses the schema enum exactly. For D-12's "Send now" behavior, the status is set to `'sending'` (not `'queued'`). The UI badge for `'sending'` displays as "Sending".
 
-2. **Edge Function deployment path**
-   - What we know: Supabase CLI is not installed on this machine. `supabase/functions/` directory does not exist yet.
-   - What's unclear: Does the project use Supabase dashboard deployment, GitHub Actions CI, or manual CLI from a different machine?
-   - Recommendation: The plan should create the Edge Function file and directory, document the deploy command, but mark the actual deployment as a manual step requiring the Supabase CLI (`supabase functions deploy send-test-email`) from an environment where it's available.
+2. **Edge Function deployment path** — RESOLVED
+   - **Resolution:** Plan creates the Edge Function file at `supabase/functions/send-test-email/index.ts`. Deployment is documented as a manual step in `user_setup` frontmatter: `supabase functions deploy send-test-email`. Supabase CLI is not available on this machine; deploy via Supabase dashboard or from an environment where CLI is installed.
 
-3. **RESEND_API_KEY availability**
-   - What we know: The Edge Function needs `Deno.env.get('RESEND_API_KEY')`. This secret must be configured in Supabase project settings.
-   - What's unclear: Whether the key is already set in the Supabase project.
-   - Recommendation: Plan task for the Edge Function should include a note: "Ensure RESEND_API_KEY is set in Supabase project secrets before testing test send."
+3. **RESEND_API_KEY availability** — RESOLVED
+   - **Resolution:** Documented in `user_setup` frontmatter of Plan 03. User must set the key via `supabase secrets set RESEND_API_KEY=re_xxxx` before testing test send. Plan 03 Task 1 Edge Function returns HTTP 500 with clear error message if key is not configured.
 
 ---
 
