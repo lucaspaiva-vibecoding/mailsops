@@ -97,6 +97,33 @@ export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_s
 
 export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
+export type RecipientStatus = 'queued' | 'sent' | 'delivered' | 'bounced' | 'complained'
+
+export interface CampaignRecipient {
+  id: string
+  campaign_id: string
+  contact_id: string
+  tracking_id: string
+  resend_email_id: string | null
+  delivery_status: RecipientStatus
+  link_map: Record<string, string> | null
+  sent_at: string | null
+  delivered_at: string | null
+  bounced_at: string | null
+  created_at: string
+}
+
+export interface TrackingEvent {
+  id: string
+  tracking_id: string
+  event_type: 'open' | 'click' | 'unsubscribe'
+  link_index: number | null
+  link_url: string | null
+  occurred_at: string
+  user_agent: string | null
+  ip_address: string | null
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -129,6 +156,16 @@ export interface Database {
         Row: Campaign
         Insert: CampaignInsert
         Update: CampaignUpdate
+      }
+      campaign_recipients: {
+        Row: CampaignRecipient
+        Insert: Omit<CampaignRecipient, 'id' | 'created_at'>
+        Update: Partial<Omit<CampaignRecipient, 'id' | 'created_at'>>
+      }
+      tracking_events: {
+        Row: TrackingEvent
+        Insert: Omit<TrackingEvent, 'id'>
+        Update: never
       }
     }
   }
