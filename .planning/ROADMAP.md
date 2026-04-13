@@ -39,7 +39,7 @@ Plans:
 - [x] 01-02-PLAN.md — TypeScript type interfaces + useContacts/useContactLists data hooks
 - [x] 01-03-PLAN.md — ContactsPage shell with tabs + Lists tab (ListsGrid, CreateListModal, ColorPicker)
 - [x] 01-04-PLAN.md — ContactsTable + ContactsFilters + ContactDrawer (CRUD + list membership)
-- [ ] 01-05-PLAN.md — CSV import wizard + import history modal
+- [x] 01-05-PLAN.md — CSV import wizard + import history modal
 
 **UI hint**: yes
 

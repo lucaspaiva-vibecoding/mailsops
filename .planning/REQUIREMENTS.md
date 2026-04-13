@@ -9,9 +9,9 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 ### Contacts (Module 2)
 
-- [ ] **CONT-01**: User can upload a CSV file and map columns to contact fields (email, first name, last name, company)
-- [ ] **CONT-02**: CSV import handles duplicates — skip or update existing contacts by email
-- [ ] **CONT-03**: User can apply tags to all contacts during CSV import
+- [x] **CONT-01**: User can upload a CSV file and map columns to contact fields (email, first name, last name, company)
+- [x] **CONT-02**: CSV import handles duplicates — skip or update existing contacts by email
+- [x] **CONT-03**: User can apply tags to all contacts during CSV import
 - [x] **CONT-04**: User can view import history with row counts and error details
 - [x] **CONT-05**: User can manually create, edit, and delete individual contacts
 - [x] **CONT-06**: User can search contacts by email or name
@@ -134,9 +134,9 @@ Deferred — not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONT-01 | Phase 1 — Contact Lists | Pending |
-| CONT-02 | Phase 1 — Contact Lists | Pending |
-| CONT-03 | Phase 1 — Contact Lists | Pending |
+| CONT-01 | Phase 1 — Contact Lists | Complete |
+| CONT-02 | Phase 1 — Contact Lists | Complete |
+| CONT-03 | Phase 1 — Contact Lists | Complete |
 | CONT-04 | Phase 1 — Contact Lists | Complete |
 | CONT-05 | Phase 1 — Contact Lists | Complete |
 | CONT-06 | Phase 1 — Contact Lists | Complete |

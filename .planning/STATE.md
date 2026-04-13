@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-contact-lists 01-04-PLAN.md
-last_updated: "2026-04-13T04:42:13.784Z"
+stopped_at: "Checkpoint: Task 3 human-verify — ContactsPage end-to-end verification"
+last_updated: "2026-04-13T04:50:10.034Z"
 last_activity: 2026-04-13
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-contact-lists P02 | 3 | 2 tasks | 3 files |
 | Phase 01-contact-lists P03 | 8 | 2 tasks | 5 files |
 | Phase 01-contact-lists P04 | 4 | 2 tasks | 4 files |
+| Phase 01-contact-lists P05 | 6 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 01-contact-lists]: useToast imported from src/components/ui/Toast.tsx (not a standalone hook file) — corrected at TypeScript compile time
 - [Phase 01-contact-lists]: Single ContactDrawer with isNew prop handles both new-contact and edit-contact modes — reduces duplication
 - [Phase 01-contact-lists]: ContactsPage merges page + listId into effectiveFilters at call time — single clean filter object passed to useContacts
+- [Phase 01-contact-lists]: Application-level duplicate detection over onConflict — partial functional index prevents PostgREST ON CONFLICT targeting
+- [Phase 01-contact-lists]: ImportHistoryModal uses fetch-on-open pattern (useEffect with open dep) to avoid background queries
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T04:42:13.782Z
-Stopped at: Completed 01-contact-lists 01-04-PLAN.md
+Last session: 2026-04-13T04:50:10.032Z
+Stopped at: Checkpoint: Task 3 human-verify — ContactsPage end-to-end verification
 Resume file: None
