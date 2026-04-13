@@ -55,31 +55,41 @@ Source: `src/components/ui/Card.tsx` padding variants; `src/pages/dashboard/Dash
 
 All roles use Tailwind utility classes. No custom font loaded — browser system-ui stack.
 
+Active type scale: exactly 4 sizes, 2 weights.
+
 | Role | Size | Weight | Line Height | Tailwind Classes |
 |------|------|--------|-------------|-----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Label | 12px | 400 (regular) | 1.4 | `text-xs` |
 | Heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
-| Display | 24px | 700 (bold) | 1.1 | `text-2xl font-bold` (stat card values) |
+| Display | 24px | 600 (semibold) | 1.1 | `text-2xl font-semibold` (stat card values) |
 
 Additional type decisions for this phase:
 
 | Context | Size | Weight | Class |
 |---------|------|--------|-------|
 | Page heading (Analytics / Dashboard) | 20px / 600 | `text-xl font-semibold text-gray-100` |
-| Section heading (Event Timeline, etc.) | 16px / 600 | `text-base font-semibold text-gray-100` |
+| Section heading (Event Timeline, etc.) | 14px / 600 | `text-sm font-semibold text-gray-100` |
 | Table header labels | 12px / 600 | `text-xs font-semibold text-gray-400 uppercase tracking-wide` |
 | Table cell primary (campaign name, email) | 14px / 600 | `text-sm font-semibold text-gray-100` |
 | Table cell secondary (dates, counts) | 14px / 400 | `text-sm text-gray-400` |
-| Stat card value | 24px / 700 | `text-2xl font-bold text-gray-100` |
+| Stat card value | 24px / 600 | `text-2xl font-semibold text-gray-100` |
 | Stat card sub-label (count alongside %) | 12px / 400 | `text-xs text-gray-400` |
 | Stat card label | 12px / 400 | `text-xs text-gray-400` |
-| Filter chip label | 12px / 500 | `text-xs font-medium` |
+| Filter chip label | 12px / 600 | `text-xs font-semibold` |
 | Relative timestamp | 14px / 400 | `text-sm text-gray-400` |
 | Absolute timestamp (tooltip) | 12px / 400 | `text-xs text-gray-500` |
-| Empty state heading | 16px / 600 | `text-base font-semibold text-gray-200` |
+| Empty state heading | 14px / 600 | `text-sm font-semibold text-gray-200` |
 | Empty state body | 14px / 400 | `text-sm text-gray-400` |
 | Dashboard welcome heading | 20px / 600 | `text-xl font-semibold text-gray-100` (existing, unchanged) |
+
+Typography Token Summary:
+
+| Token | Value |
+|-------|-------|
+| Sizes in use | 12px, 14px, 20px, 24px (4 total) |
+| Weights in use | 400 (regular), 600 (semibold) (2 total) |
+| Forbidden weights | `font-medium` (500), `font-bold` (700) — do not use |
 
 Source: `src/pages/campaigns/CampaignsPage.tsx` table patterns; `src/pages/dashboard/DashboardPage.tsx` stat card patterns.
 
