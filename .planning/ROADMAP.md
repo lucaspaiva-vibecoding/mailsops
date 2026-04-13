@@ -38,7 +38,7 @@ Plans:
 - [x] 01-01-PLAN.md — DB migrations (import_logs table, contact_count trigger) + papaparse install
 - [x] 01-02-PLAN.md — TypeScript type interfaces + useContacts/useContactLists data hooks
 - [x] 01-03-PLAN.md — ContactsPage shell with tabs + Lists tab (ListsGrid, CreateListModal, ColorPicker)
-- [ ] 01-04-PLAN.md — ContactsTable + ContactsFilters + ContactDrawer (CRUD + list membership)
+- [x] 01-04-PLAN.md — ContactsTable + ContactsFilters + ContactDrawer (CRUD + list membership)
 - [ ] 01-05-PLAN.md — CSV import wizard + import history modal
 
 **UI hint**: yes
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Contact Lists | 3/5 | In Progress|  |
+| 1. Contact Lists | 4/5 | In Progress|  |
 | 2. Campaign Builder | 0/? | Not started | - |
 | 3. Email Delivery Engine | 0/? | Not started | - |
 | 4. Analytics & Dashboard | 0/? | Not started | - |
