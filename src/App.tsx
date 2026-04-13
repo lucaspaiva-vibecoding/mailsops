@@ -10,6 +10,8 @@ import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { ProfilePage } from './pages/settings/ProfilePage'
 import { ContactsPage } from './pages/contacts/ContactsPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { CampaignsPage } from './pages/campaigns/CampaignsPage'
+import { CampaignBuilderPage } from './pages/campaigns/CampaignBuilderPage'
 
 export default function App() {
   return (
@@ -29,7 +31,9 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/contacts" element={<ContactsPage />} />
-                <Route path="/campaigns" element={<PlaceholderPage title="Campaigns" />} />
+                <Route path="/campaigns" element={<CampaignsPage />} />
+                <Route path="/campaigns/new" element={<CampaignBuilderPage />} />
+                <Route path="/campaigns/:id/edit" element={<CampaignBuilderPage />} />
                 <Route path="/templates" element={<PlaceholderPage title="Templates" />} />
                 <Route path="/analytics" element={<PlaceholderPage title="Analytics" />} />
                 <Route path="/settings/profile" element={<ProfilePage />} />

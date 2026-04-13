@@ -61,6 +61,42 @@ export interface ContactImportLog {
 export type ContactInsert = Omit<Contact, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 export type ContactUpdate = Partial<Omit<Contact, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
+export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled'
+
+export interface Campaign {
+  id: string
+  workspace_id: string
+  name: string
+  status: CampaignStatus
+  from_name: string
+  from_email: string
+  reply_to_email: string | null
+  subject: string
+  preview_text: string | null
+  body_html: string
+  body_json: Record<string, unknown> | null
+  contact_list_id: string | null
+  segment_filter: Record<string, unknown> | null
+  scheduled_at: string | null
+  sent_at: string | null
+  total_recipients: number
+  total_sent: number
+  total_delivered: number
+  total_opened: number
+  total_clicked: number
+  total_replied: number
+  total_bounced: number
+  total_unsubscribed: number
+  settings: Record<string, unknown>
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+}
+
+export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_sent' | 'total_delivered' | 'total_opened' | 'total_clicked' | 'total_replied' | 'total_bounced' | 'total_unsubscribed' | 'created_at' | 'updated_at' | 'deleted_at' | 'sent_at'>
+
+export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
+
 export interface Database {
   public: {
     Tables: {
@@ -88,6 +124,11 @@ export interface Database {
         Row: ContactImportLog
         Insert: Omit<ContactImportLog, 'id' | 'created_at'>
         Update: never
+      }
+      campaigns: {
+        Row: Campaign
+        Insert: CampaignInsert
+        Update: CampaignUpdate
       }
     }
   }
