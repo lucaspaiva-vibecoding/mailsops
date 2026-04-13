@@ -85,10 +85,13 @@ export function ContactDrawer({ contact, isNew = false, onClose, onUpdated, onDe
 
   async function fetchMemberships(contactId: string) {
     setMembershipsLoading(true)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('contact_list_members')
       .select('*, contact_lists(id, name, color)')
       .eq('contact_id', contactId)
+    if (error) {
+      showToast('Failed to load list memberships.', 'error')
+    }
     setMemberships((data as ListMembership[]) ?? [])
     setMembershipsLoading(false)
   }
