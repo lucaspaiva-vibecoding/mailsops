@@ -15,34 +15,20 @@ export function ContactsFilters({ filters, onFiltersChange }: ContactsFiltersPro
   const [customFieldKey, setCustomFieldKey] = useState(filters.customFieldKey ?? '')
   const [customFieldValue, setCustomFieldValue] = useState(filters.customFieldValue ?? '')
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onFiltersChange({ ...filters, search: search || undefined, page: 1 })
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Debounce tag
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onFiltersChange({ ...filters, tag: tag || undefined, page: 1 })
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [tag]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Debounce custom field
+  // Debounce all text filter fields together to avoid stale closure merging issues
   useEffect(() => {
     const timer = setTimeout(() => {
       onFiltersChange({
         ...filters,
+        search: search || undefined,
+        tag: tag || undefined,
         customFieldKey: customFieldKey || undefined,
         customFieldValue: customFieldValue || undefined,
         page: 1,
       })
     }, 300)
     return () => clearTimeout(timer)
-  }, [customFieldKey, customFieldValue]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search, tag, customFieldKey, customFieldValue]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasActiveFilters = !!(search || filters.status || tag || customFieldKey)
 
