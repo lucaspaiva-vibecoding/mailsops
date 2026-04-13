@@ -53,7 +53,14 @@ Plans:
   3. User can select a contact list as the campaign target and schedule it for future delivery
   4. User can send a test email to themselves before launching
   5. User can save drafts, return to edit them, and duplicate existing campaigns
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Campaign types, data hooks (useCampaigns/useCampaign), TIMEZONES extraction, route wiring
+- [ ] 02-02-PLAN.md — TipTap editor components: VariableChipNode extension, toolbar, variable dropdown, preview
+- [ ] 02-03-PLAN.md — Campaign builder page: form layout, scheduling, test send Edge Function, save/schedule
+- [ ] 02-04-PLAN.md — Campaign list page: table with status badges, duplicate/delete actions, empty state
+
 **UI hint**: yes
 
 ### Phase 3: Email Delivery Engine
@@ -123,8 +130,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Contact Lists | 4/5 | In Progress|  |
-| 2. Campaign Builder | 0/? | Not started | - |
+| 1. Contact Lists | 5/5 | Complete |  |
+| 2. Campaign Builder | 0/4 | Not started | - |
 | 3. Email Delivery Engine | 0/? | Not started | - |
 | 4. Analytics & Dashboard | 0/? | Not started | - |
 | 5. A/B Testing | 0/? | Not started | - |
