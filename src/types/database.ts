@@ -97,31 +97,76 @@ export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_s
 
 export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
-export type RecipientStatus = 'queued' | 'sent' | 'delivered' | 'bounced' | 'complained'
+export type RecipientStatus =
+  | 'pending' | 'queued' | 'sent' | 'delivered' | 'opened'
+  | 'clicked' | 'replied' | 'bounced' | 'unsubscribed' | 'failed'
 
 export interface CampaignRecipient {
   id: string
   campaign_id: string
   contact_id: string
-  tracking_id: string
-  resend_email_id: string | null
-  delivery_status: RecipientStatus
-  link_map: Record<string, string> | null
+  workspace_id: string
+  status: RecipientStatus
+  resend_message_id: string | null
+  variables: Record<string, string>
   sent_at: string | null
   delivered_at: string | null
+  opened_at: string | null
+  clicked_at: string | null
+  replied_at: string | null
   bounced_at: string | null
+  unsubscribed_at: string | null
+  tracking_id: string
   created_at: string
 }
 
-export interface TrackingEvent {
+export type CampaignEventType =
+  | 'sent' | 'delivered' | 'opened' | 'clicked'
+  | 'replied' | 'bounced' | 'unsubscribed' | 'complained'
+
+export interface CampaignEvent {
   id: string
-  tracking_id: string
-  event_type: 'open' | 'click' | 'unsubscribe'
-  link_index: number | null
+  campaign_id: string
+  recipient_id: string
+  workspace_id: string
+  event_type: CampaignEventType
   link_url: string | null
-  occurred_at: string
-  user_agent: string | null
+  link_index: number | null
   ip_address: string | null
+  user_agent: string | null
+  device_type: string | null
+  email_client: string | null
+  country: string | null
+  city: string | null
+  bounce_type: 'hard' | 'soft' | null
+  bounce_reason: string | null
+  created_at: string
+}
+
+export interface CampaignLink {
+  id: string
+  campaign_id: string
+  original_url: string
+  link_index: number
+  click_count: number
+  unique_clicks: number
+  created_at: string
+}
+
+export interface CampaignEventWithContact extends CampaignEvent {
+  contacts: Pick<Contact, 'email' | 'first_name' | 'last_name'> | null
+}
+
+export interface CampaignRecipientWithContact extends CampaignRecipient {
+  contacts: Pick<Contact, 'email' | 'first_name' | 'last_name'> | null
+}
+
+export interface RecipientStatusCounts {
+  all: number
+  opened: number
+  clicked: number
+  bounced: number
+  unsubscribed: number
 }
 
 export interface Database {
@@ -159,13 +204,18 @@ export interface Database {
       }
       campaign_recipients: {
         Row: CampaignRecipient
-        Insert: Omit<CampaignRecipient, 'id' | 'created_at'>
-        Update: Partial<Omit<CampaignRecipient, 'id' | 'created_at'>>
+        Insert: Omit<CampaignRecipient, 'id' | 'created_at' | 'tracking_id'>
+        Update: Partial<Omit<CampaignRecipient, 'id' | 'created_at' | 'campaign_id' | 'contact_id' | 'workspace_id'>>
       }
-      tracking_events: {
-        Row: TrackingEvent
-        Insert: Omit<TrackingEvent, 'id'>
+      campaign_events: {
+        Row: CampaignEvent
+        Insert: Omit<CampaignEvent, 'id' | 'created_at'>
         Update: never
+      }
+      campaign_links: {
+        Row: CampaignLink
+        Insert: Omit<CampaignLink, 'id' | 'created_at'>
+        Update: Partial<Pick<CampaignLink, 'click_count' | 'unique_clicks'>>
       }
     }
   }
