@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-campaign-builder-02-PLAN.md
-last_updated: "2026-04-13T11:32:14.475Z"
+stopped_at: Completed 02-campaign-builder-03-PLAN.md
+last_updated: "2026-04-13T11:37:44.388Z"
 last_activity: 2026-04-13
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 ## Current Position
 
 Phase: 02 (campaign-builder) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-13
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-contact-lists P05 | 6 | 2 tasks | 3 files |
 | Phase 02-campaign-builder P01 | 2 | 2 tasks | 9 files |
 | Phase 02-campaign-builder P02 | 4 | 3 tasks | 7 files |
+| Phase 02-campaign-builder P03 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [Phase 02-campaign-builder]: TipTap extensions installed at 2.27.2 (matching actual installed core version) - latest 3.x requires core@^3 which conflicts with installed 2.27.2
 - [Phase 02-campaign-builder]: VariableSlashCommand uses clientRect API for popup positioning (Suggestion 2.27.x) not view.coordsAtPos - idiomatic API for this version
 - [Phase 02-campaign-builder]: VARIABLES constant exported from VariableDropdown.tsx alongside component - matches pre-existing Toast.tsx pattern, react-refresh warning accepted
+- [Phase 02-campaign-builder]: scheduleMode='now' sets status='sending' (not 'queued') — aligns with live DB schema values confirmed in Plan 01
+- [Phase 02-campaign-builder]: scheduledAt converted to UTC via new Date(datetimeLocalString).toISOString() — datetime-local input returns local time, toISOString() converts to UTC for DB
+- [Phase 02-campaign-builder]: populated guard state prevents form re-population when useCampaign refetches after updateCampaign calls
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T11:32:14.473Z
-Stopped at: Completed 02-campaign-builder-02-PLAN.md
+Last session: 2026-04-13T11:37:44.386Z
+Stopped at: Completed 02-campaign-builder-03-PLAN.md
 Resume file: None

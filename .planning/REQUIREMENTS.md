@@ -32,9 +32,9 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 - [x] **CAMP-01**: User can create a campaign with name, subject line, preview text, sender name, and sender email
 - [x] **CAMP-02**: User can build email body with TipTap rich text editor (bold, italic, links, headings, bullets, images)
 - [x] **CAMP-03**: User can insert personalization variables ({{first_name}}, {{last_name}}, {{company}}) into subject or body
-- [ ] **CAMP-04**: User can select a contact list as campaign target
-- [ ] **CAMP-05**: User can schedule a campaign for future delivery
-- [ ] **CAMP-06**: User can send a test email to their own address before launching
+- [x] **CAMP-04**: User can select a contact list as campaign target
+- [x] **CAMP-05**: User can schedule a campaign for future delivery
+- [x] **CAMP-06**: User can send a test email to their own address before launching
 - [x] **CAMP-07**: User can save campaign as draft and return to edit later
 - [x] **CAMP-08**: User can duplicate an existing campaign
 
@@ -151,9 +151,9 @@ Deferred — not in current roadmap.
 | CAMP-01 | Phase 2 — Campaign Builder | Complete |
 | CAMP-02 | Phase 2 — Campaign Builder | Complete |
 | CAMP-03 | Phase 2 — Campaign Builder | Complete |
-| CAMP-04 | Phase 2 — Campaign Builder | Pending |
-| CAMP-05 | Phase 2 — Campaign Builder | Pending |
-| CAMP-06 | Phase 2 — Campaign Builder | Pending |
+| CAMP-04 | Phase 2 — Campaign Builder | Complete |
+| CAMP-05 | Phase 2 — Campaign Builder | Complete |
+| CAMP-06 | Phase 2 — Campaign Builder | Complete |
 | CAMP-07 | Phase 2 — Campaign Builder | Complete |
 | CAMP-08 | Phase 2 — Campaign Builder | Complete |
 | DELV-01 | Phase 3 — Email Delivery Engine | Pending |

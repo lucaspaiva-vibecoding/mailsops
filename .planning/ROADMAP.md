@@ -58,7 +58,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Campaign types, data hooks (useCampaigns/useCampaign), TIMEZONES extraction, route wiring
 - [x] 02-02-PLAN.md — TipTap editor components: VariableChipNode extension, toolbar, variable dropdown, preview
-- [ ] 02-03-PLAN.md — Campaign builder page: form layout, scheduling, test send Edge Function, save/schedule
+- [x] 02-03-PLAN.md — Campaign builder page: form layout, scheduling, test send Edge Function, save/schedule
 - [ ] 02-04-PLAN.md — Campaign list page: table with status badges, duplicate/delete actions, empty state
 
 **UI hint**: yes
