@@ -50,5 +50,24 @@ export function useCampaign(id: string | undefined) {
     return { error: null }
   }
 
-  return { campaign, loading, error, refetch: fetchCampaign, updateCampaign }
+  const sendCampaign = async (): Promise<{ error: string | null; sent?: number; total?: number }> => {
+    if (!profile?.workspace_id || !id) return { error: 'Not authenticated' }
+
+    const { data, error } = await supabase.functions.invoke('send-campaign', {
+      body: { campaign_id: id },
+    })
+
+    if (error) {
+      return { error: error.message || 'Failed to send campaign' }
+    }
+
+    if (data && !data.ok) {
+      return { error: data.error || 'Campaign send failed', sent: data.sent, total: data.total }
+    }
+
+    await fetchCampaign()
+    return { error: null, sent: data?.sent, total: data?.total }
+  }
+
+  return { campaign, loading, error, refetch: fetchCampaign, updateCampaign, sendCampaign }
 }
