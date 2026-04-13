@@ -19,6 +19,7 @@ import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useCampaign } from '../../hooks/campaigns/useCampaign'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
+import { supabase } from '../../lib/supabase'
 import type { CampaignStatus } from '../../types/database'
 
 export function CampaignBuilderPage() {
@@ -28,7 +29,7 @@ export function CampaignBuilderPage() {
 
   // Data hooks
   const { createCampaign } = useCampaigns()
-  const { campaign, loading: campaignLoading, updateCampaign } = useCampaign(id)
+  const { campaign, loading: campaignLoading, updateCampaign, sendCampaign } = useCampaign(id)
   const { lists } = useContactLists()
 
   // Form state
@@ -44,6 +45,7 @@ export function CampaignBuilderPage() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+  const [sending, setSending] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [populated, setPopulated] = useState(false)
 
@@ -198,57 +200,138 @@ export function CampaignBuilderPage() {
   const handleScheduleSend = async () => {
     if (!validate(true)) return
 
-    setSaving(true)
-    let status: CampaignStatus
-    let scheduledAtUtc: string | null = null
-
     if (scheduleMode === 'now') {
-      status = 'sending'
-    } else {
-      status = 'scheduled'
-      // datetime-local returns 'YYYY-MM-DDTHH:MM', new Date() interprets as local time
-      scheduledAtUtc = new Date(scheduledAt).toISOString()
-    }
+      // Confirm before sending
+      const confirmed = window.confirm(
+        'Send this campaign to all contacts in the selected list? This action cannot be undone.'
+      )
+      if (!confirmed) return
 
-    const payload = {
-      name: name || 'Untitled campaign',
-      status,
-      subject,
-      preview_text: previewText,
-      from_name: fromName,
-      from_email: fromEmail,
-      body_html: editor?.getHTML() ?? '',
-      body_json: editor?.getJSON() ?? null,
-      contact_list_id: contactListId || null,
-      scheduled_at: scheduledAtUtc,
-      reply_to_email: null,
-      segment_filter: null,
-      settings: {},
-    }
+      setSending(true)
 
-    let saveError: string | null = null
-
-    if (id && campaign) {
-      const result = await updateCampaign(payload)
-      saveError = result.error
-    } else {
-      const result = await createCampaign(payload)
-      saveError = result.error
-    }
-
-    if (saveError) {
-      showToast(saveError, 'error')
-    } else {
-      if (scheduleMode === 'later') {
-        showToast('Campaign scheduled.', 'success')
-      } else {
-        showToast('Campaign queued for sending.', 'success')
+      const savePayload = {
+        name: name || 'Untitled campaign',
+        subject,
+        preview_text: previewText,
+        from_name: fromName,
+        from_email: fromEmail,
+        body_html: editor?.getHTML() ?? '',
+        body_json: editor?.getJSON() ?? null,
+        contact_list_id: contactListId || null,
+        scheduled_at: null,
+        reply_to_email: null,
+        segment_filter: null,
+        settings: {},
       }
-      setDirty(false)
-      navigate('/campaigns')
+
+      let campaignIdToSend: string | undefined = id
+
+      if (id && campaign) {
+        // Edit mode — save latest content first
+        const { error: saveError } = await updateCampaign(savePayload)
+        if (saveError) {
+          showToast(saveError, 'error')
+          setSending(false)
+          return
+        }
+        // sendCampaign from the hook uses the id from useParams
+        const { error: sendError, sent, total } = await sendCampaign()
+        if (sendError) {
+          showToast(sendError, 'error')
+          setSending(false)
+          return
+        }
+        showToast(`Campaign sent to ${sent ?? 0} of ${total ?? 0} contacts.`, 'success')
+        setDirty(false)
+        navigate('/campaigns')
+      } else {
+        // Create mode — create as draft first, then invoke send-campaign directly with the new ID
+        const { data: newCampaign, error: createError } = await createCampaign({
+          ...savePayload,
+          status: 'draft' as CampaignStatus,
+        })
+        if (createError || !newCampaign) {
+          showToast(createError || 'Failed to create campaign', 'error')
+          setSending(false)
+          return
+        }
+        campaignIdToSend = newCampaign.id
+        // Invoke send-campaign directly with the new campaign ID
+        const { data, error: invokeError } = await supabase.functions.invoke('send-campaign', {
+          body: { campaign_id: campaignIdToSend },
+        })
+        if (invokeError) {
+          showToast(invokeError.message || 'Failed to send campaign', 'error')
+          setSending(false)
+          navigate(`/campaigns/${campaignIdToSend}/edit`, { replace: true })
+          return
+        }
+        if (data && !data.ok) {
+          showToast(data.error || 'Campaign send failed', 'error')
+          setSending(false)
+          navigate(`/campaigns/${campaignIdToSend}/edit`, { replace: true })
+          return
+        }
+        showToast(`Campaign sent to ${data?.sent ?? 0} of ${data?.total ?? 0} contacts.`, 'success')
+        setDirty(false)
+        navigate('/campaigns')
+      }
+
+      setSending(false)
+    } else {
+      // Schedule mode — save with status 'scheduled' and navigate
+      setSaving(true)
+      // datetime-local returns 'YYYY-MM-DDTHH:MM', new Date() interprets as local time
+      const scheduledAtUtc = new Date(scheduledAt).toISOString()
+
+      const payload = {
+        name: name || 'Untitled campaign',
+        status: 'scheduled' as CampaignStatus,
+        subject,
+        preview_text: previewText,
+        from_name: fromName,
+        from_email: fromEmail,
+        body_html: editor?.getHTML() ?? '',
+        body_json: editor?.getJSON() ?? null,
+        contact_list_id: contactListId || null,
+        scheduled_at: scheduledAtUtc,
+        reply_to_email: null,
+        segment_filter: null,
+        settings: {},
+      }
+
+      let saveError: string | null = null
+
+      if (id && campaign) {
+        const result = await updateCampaign(payload)
+        saveError = result.error
+      } else {
+        const result = await createCampaign(payload)
+        saveError = result.error
+      }
+
+      if (saveError) {
+        showToast(saveError, 'error')
+      } else {
+        showToast('Campaign scheduled.', 'success')
+        setDirty(false)
+        navigate('/campaigns')
+      }
+      setSaving(false)
     }
-    setSaving(false)
   }
+
+  // Send eligibility — block re-sending already-sent or currently-sending campaigns
+  const canSend = !campaign || campaign.status === 'draft' || campaign.status === 'scheduled'
+
+  // Button label for the schedule/send action
+  const sendButtonLabel = campaign?.status === 'sent'
+    ? 'Already Sent'
+    : sending
+      ? 'Sending...'
+      : scheduleMode === 'now'
+        ? 'Send Now'
+        : 'Schedule'
 
   // Loading state for edit mode
   if (id && campaignLoading && !populated) {
@@ -284,11 +367,12 @@ export function CampaignBuilderPage() {
           <Button
             variant="primary"
             size="md"
-            loading={saving}
+            loading={sending}
+            disabled={!canSend || sending}
             onClick={handleScheduleSend}
             type="button"
           >
-            Schedule / Send
+            {sendButtonLabel}
           </Button>
         </div>
       </div>
@@ -503,11 +587,12 @@ export function CampaignBuilderPage() {
         <Button
           variant="primary"
           size="md"
-          loading={saving}
+          loading={sending}
+          disabled={!canSend || sending}
           onClick={handleScheduleSend}
           type="button"
         >
-          Schedule / Send
+          {sendButtonLabel}
         </Button>
       </div>
     </div>
