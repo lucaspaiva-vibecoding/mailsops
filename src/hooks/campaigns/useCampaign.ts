@@ -53,8 +53,12 @@ export function useCampaign(id: string | undefined) {
   const sendCampaign = async (): Promise<{ error: string | null; sent?: number; total?: number }> => {
     if (!profile?.workspace_id || !id) return { error: 'Not authenticated' }
 
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return { error: 'Not authenticated' }
+
     const { data, error } = await supabase.functions.invoke('send-campaign', {
       body: { campaign_id: id },
+      headers: { Authorization: `Bearer ${session.access_token}` },
     })
 
     if (error) {

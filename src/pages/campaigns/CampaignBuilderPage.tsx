@@ -257,8 +257,10 @@ export function CampaignBuilderPage() {
         }
         campaignIdToSend = newCampaign.id
         // Invoke send-campaign directly with the new campaign ID
+        const { data: { session } } = await supabase.auth.getSession()
         const { data, error: invokeError } = await supabase.functions.invoke('send-campaign', {
           body: { campaign_id: campaignIdToSend },
+          headers: { Authorization: `Bearer ${session?.access_token}` },
         })
         if (invokeError) {
           showToast(invokeError.message || 'Failed to send campaign', 'error')
