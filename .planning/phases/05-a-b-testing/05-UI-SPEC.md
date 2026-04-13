@@ -44,7 +44,7 @@ Declared values (must be multiples of 4):
 Exceptions:
 - Touch targets for icon-only buttons: 32px × 32px (`w-8 h-8`) — matches existing `Button ghost sm` pattern in CampaignsPage
 - Stat card icon containers: 40px × 40px (`w-10 h-10`) — matches existing StatCard component
-- Test group size slider/input thumb: minimum 44px touch target height on mobile
+- Test group size slider/input thumb: minimum 40px touch target height on mobile (`min-h-10`)
 
 Source: extracted from `CampaignsPage.tsx`, `AppLayout.tsx` (`p-4 lg:p-6`), `StatCard.tsx`.
 
@@ -120,6 +120,8 @@ New components required for this phase:
 ## Layout Patterns
 
 ### A/B Test Builder Page (`/campaigns/ab-test/new`, `/campaigns/:id/ab-test/edit`)
+
+Primary focal point: `VariantTabStrip` + active variant editor panel — shared settings card is secondary.
 
 ```
 Page header row
