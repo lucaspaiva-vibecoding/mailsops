@@ -94,7 +94,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Fix database.ts types + analytics utility helpers + useCampaignAnalytics and useDashboardStats hooks
+- [x] 04-01-PLAN.md — Fix database.ts types + analytics utility helpers + useCampaignAnalytics and useDashboardStats hooks
 - [ ] 04-02-PLAN.md — Campaign Analytics Page: StatCard, EventTimeline, LinkBreakdown, RecipientTable components
 - [ ] 04-03-PLAN.md — Dashboard live data + recent campaigns table + analytics route wiring + View analytics action
 
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Contact Lists | 5/5 | Complete |  |
 | 2. Campaign Builder | 2/4 | In Progress|  |
 | 3. Email Delivery Engine | 0/5 | Not started | - |
-| 4. Analytics & Dashboard | 0/3 | Not started | - |
+| 4. Analytics & Dashboard | 1/3 | In Progress|  |
 | 5. A/B Testing | 0/? | Not started | - |
 | 6. Sequences | 0/? | Not started | - |
 | 7. Templates & Settings | 0/? | Not started | - |
