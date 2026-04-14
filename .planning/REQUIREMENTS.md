@@ -65,7 +65,7 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 - [x] **ABTS-01**: User can create an A/B test campaign with 2 variants (different subject lines and/or bodies)
 - [x] **ABTS-02**: User can set the test split percentage between variants (e.g., 50/50)
-- [ ] **ABTS-03**: User can view A/B test results comparing open rate and click rate per variant
+- [x] **ABTS-03**: User can view A/B test results comparing open rate and click rate per variant
 - [x] **ABTS-04**: User can manually select a winning variant and send it to the remaining contacts
 
 ### Sequences / Drip Campaigns (Module 8)
@@ -172,7 +172,7 @@ Deferred — not in current roadmap.
 | DASH-03 | Phase 4 — Analytics & Dashboard | Complete |
 | ABTS-01 | Phase 5 — A/B Testing | Complete |
 | ABTS-02 | Phase 5 — A/B Testing | Complete |
-| ABTS-03 | Phase 5 — A/B Testing | Pending |
+| ABTS-03 | Phase 5 — A/B Testing | Complete |
 | ABTS-04 | Phase 5 — A/B Testing | Complete |
 | SEQN-01 | Phase 6 — Sequences | Pending |
 | SEQN-02 | Phase 6 — Sequences | Pending |
