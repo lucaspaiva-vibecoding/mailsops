@@ -4,6 +4,8 @@ import { Plus, MoreHorizontal, Mail, Upload, FlaskConical } from 'lucide-react'
 import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
+import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
@@ -33,12 +35,36 @@ const statusLabel: Record<CampaignStatus, string> = {
 export function CampaignsPage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const { profile } = useAuth()
   const { campaigns, loading, refetch, deleteCampaign, duplicateCampaign } = useCampaigns()
   const { lists } = useContactLists()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [showImportModal, setShowImportModal] = useState(false)
   const [saveAsTemplateTarget, setSaveAsTemplateTarget] = useState<Campaign | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const menuRef = useRef<HTMLDivElement | null>(null)
+
+  const allSelected = campaigns.length > 0 && campaigns.every(c => selectedIds.has(c.id))
+  const toggleSelect = (id: string) => setSelectedIds(prev => {
+    const next = new Set(prev)
+    if (next.has(id)) { next.delete(id) } else { next.add(id) }
+    return next
+  })
+  const toggleAll = () => setSelectedIds(
+    allSelected ? new Set() : new Set(campaigns.map(c => c.id))
+  )
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Delete ${selectedIds.size} campaign(s)? This cannot be undone.`)) return
+    const { error } = await supabase
+      .from('campaigns')
+      .update({ deleted_at: new Date().toISOString() })
+      .in('id', [...selectedIds])
+      .eq('workspace_id', profile!.workspace_id)
+    if (error) showToast(error.message, 'error')
+    else { showToast(`${selectedIds.size} campaign(s) deleted.`, 'success'); setSelectedIds(new Set()) }
+    await refetch()
+  }
 
   const listMap = Object.fromEntries(lists.map((l) => [l.id, l.name]))
 
@@ -107,6 +133,14 @@ export function CampaignsPage() {
         </div>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg">
+          <span className="text-sm text-gray-300">{selectedIds.size} selected</span>
+          <Button variant="danger" size="sm" onClick={handleBulkDelete}>Delete selected</Button>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+        </div>
+      )}
+
       <Card padding="sm" className="overflow-hidden p-0">
         {loading ? (
           <div className="flex items-center justify-center py-16">
@@ -129,6 +163,10 @@ export function CampaignsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
+                  <th className="px-4 py-3 w-10 bg-gray-900">
+                    <input type="checkbox" className="w-4 h-4 accent-indigo-500 cursor-pointer"
+                      checked={allSelected} onChange={toggleAll} />
+                  </th>
                   <th className="text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-900 px-4 py-3 text-left">
                     Campaign
                   </th>
@@ -151,6 +189,10 @@ export function CampaignsPage() {
                     onClick={(e) => handleRowClick(e, campaign)}
                     className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
                   >
+                    <td className="px-4 py-3 w-10" onClick={(e) => e.stopPropagation()}>
+                      <input type="checkbox" className="w-4 h-4 accent-indigo-500 cursor-pointer"
+                        checked={selectedIds.has(campaign.id)} onChange={() => toggleSelect(campaign.id)} />
+                    </td>
                     <td className="px-4 py-3 text-sm font-semibold text-gray-100">
                       {campaign.name}
                     </td>

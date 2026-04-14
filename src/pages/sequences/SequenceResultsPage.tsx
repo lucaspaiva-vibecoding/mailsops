@@ -68,7 +68,8 @@ export function SequenceResultsPage() {
       } else {
         // Aggregate per step
         const statsMap: Record<number, { sent: number; opened: number; clicked: number }> = {}
-        ;(sends ?? []).forEach((send: any) => {
+        type SendRow = { step_number: number; campaign_recipients: { opened_at: string | null; clicked_at: string | null } | null }
+        ;((sends ?? []) as unknown as SendRow[]).forEach((send) => {
           const sn = send.step_number
           if (!statsMap[sn]) statsMap[sn] = { sent: 0, opened: 0, clicked: 0 }
           statsMap[sn].sent++

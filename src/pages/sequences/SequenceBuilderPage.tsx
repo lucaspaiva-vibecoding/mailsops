@@ -224,8 +224,9 @@ export function SequenceBuilderPage() {
       .select('contact_id, contacts(id, status)')
       .eq('contact_list_id', contactListId)
 
-    const activeCount = (members ?? []).filter(
-      (m: any) => m.contacts && m.contacts.status === 'active'
+    type MemberRow = { contacts: { id: string; status: string } | null }
+    const activeCount = ((members ?? []) as unknown as MemberRow[]).filter(
+      (m) => m.contacts && m.contacts.status === 'active'
     ).length
 
     setEnrollCount(activeCount)

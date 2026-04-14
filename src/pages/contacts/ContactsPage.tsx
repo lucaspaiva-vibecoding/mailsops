@@ -9,6 +9,9 @@ import { ImportWizardModal } from '../../components/contacts/ImportWizardModal'
 import { ImportHistoryModal } from '../../components/contacts/ImportHistoryModal'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useContacts } from '../../hooks/contacts/useContacts'
+import { useAuth } from '../../hooks/useAuth'
+import { useToast } from '../../components/ui/Toast'
+import { supabase } from '../../lib/supabase'
 import type { Contact } from '../../types/database'
 import type { ContactFilters } from '../../hooks/contacts/useContacts'
 
@@ -23,6 +26,9 @@ export function ContactsPage() {
   const [showNewContact, setShowNewContact] = useState(false)
   const [showImportWizard, setShowImportWizard] = useState(false)
   const [showImportHistory, setShowImportHistory] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const { profile } = useAuth()
+  const { showToast } = useToast()
 
   const activeListId = searchParams.get('list')
 
@@ -44,11 +50,33 @@ export function ContactsPage() {
 
   const hasFilters = !!(filters.search || filters.status || filters.tag || filters.customFieldKey)
 
+  const toggleSelect = (id: string) => setSelectedIds(prev => {
+    const next = new Set(prev)
+    if (next.has(id)) { next.delete(id) } else { next.add(id) }
+    return next
+  })
+  const toggleAll = () => setSelectedIds(
+    contacts.every(c => selectedIds.has(c.id)) ? new Set() : new Set(contacts.map(c => c.id))
+  )
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Delete ${selectedIds.size} contact(s)? This cannot be undone.`)) return
+    const { error } = await supabase
+      .from('contacts')
+      .update({ deleted_at: new Date().toISOString() })
+      .in('id', [...selectedIds])
+      .eq('workspace_id', profile!.workspace_id)
+    if (error) showToast(error.message, 'error')
+    else { showToast(`${selectedIds.size} contact(s) deleted.`, 'success'); setSelectedIds(new Set()) }
+    await refetchContacts()
+  }
+
   const handleTabChange = (tab: ActiveTab) => {
     if (tab === 'contacts') {
       setSearchParams({})
     }
     setActiveTab(tab)
+    setSelectedIds(new Set())
   }
 
   const handleListClick = (listId: string) => {
@@ -172,6 +200,13 @@ export function ContactsPage() {
             filters={filters}
             onFiltersChange={handleFiltersChange}
           />
+          {activeTab === 'contacts' && selectedIds.size > 0 && (
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg">
+              <span className="text-sm text-gray-300">{selectedIds.size} selected</span>
+              <Button variant="danger" size="sm" onClick={handleBulkDelete}>Delete selected</Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+            </div>
+          )}
           <ContactsTable
             contacts={contacts}
             loading={contactsLoading}
@@ -181,6 +216,9 @@ export function ContactsPage() {
             hasFilters={hasFilters}
             onPageChange={handlePageChange}
             onContactClick={handleContactClick}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelect}
+            onToggleAll={toggleAll}
           />
         </div>
       )}

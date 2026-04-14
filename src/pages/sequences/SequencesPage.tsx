@@ -49,7 +49,7 @@ export function SequencesPage() {
       .in('sequence_id', seqIds)
       .then(({ data }) => {
         const counts: Record<string, number> = {}
-        ;(data ?? []).forEach((row: any) => {
+        ;(data ?? []).forEach((row: { sequence_id: string }) => {
           counts[row.sequence_id] = (counts[row.sequence_id] ?? 0) + 1
         })
         setStepCounts(counts)
@@ -62,7 +62,7 @@ export function SequencesPage() {
       .in('sequence_id', seqIds)
       .then(({ data }) => {
         const counts: Record<string, number> = {}
-        ;(data ?? []).forEach((row: any) => {
+        ;(data ?? []).forEach((row: { sequence_id: string }) => {
           counts[row.sequence_id] = (counts[row.sequence_id] ?? 0) + 1
         })
         setEnrollCounts(counts)

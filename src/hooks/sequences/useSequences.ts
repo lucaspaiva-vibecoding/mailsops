@@ -92,9 +92,10 @@ export function useSequences() {
 
     if (membersError) return { error: membersError.message, count: 0 }
 
-    const activeContactIds = (members ?? [])
-      .filter((m: any) => m.contacts && m.contacts.status === 'active')
-      .map((m: any) => m.contacts.id as string)
+    type MemberRow = { contacts: { id: string; status: string } | null }
+    const activeContactIds = ((members ?? []) as unknown as MemberRow[])
+      .filter((m) => m.contacts && m.contacts.status === 'active')
+      .map((m) => (m.contacts as { id: string; status: string }).id)
 
     if (activeContactIds.length === 0) return { error: 'No active contacts in target list', count: 0 }
 
