@@ -153,7 +153,7 @@ Plans:
 - [x] 07-01-PLAN.md — DB migration (templates table + profiles extensions), TypeScript types, useTemplates data hook
 - [x] 07-02-PLAN.md — TemplatesPage with table layout, row actions (Use template + Delete), route wiring
 - [x] 07-03-PLAN.md — SaveAsTemplateModal, CampaignsPage/CampaignBuilderPage entry points, template pre-fill
-- [ ] 07-04-PLAN.md — SettingsPage with Profile/Workspace/Integrations tabs, routing + sidebar updates
+- [x] 07-04-PLAN.md — SettingsPage with Profile/Workspace/Integrations tabs, routing + sidebar updates
 - [ ] 07-05-PLAN.md — [BLOCKING] Schema push to live Supabase + build/lint verification + smoke test
 
 **UI hint**: yes
@@ -171,4 +171,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Analytics & Dashboard | 2/3 | In Progress|  |
 | 5. A/B Testing | 0/3 | Not started | - |
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
-| 7. Templates & Settings | 3/5 | In Progress|  |
+| 7. Templates & Settings | 4/5 | In Progress|  |

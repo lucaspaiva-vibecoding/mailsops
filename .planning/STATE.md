@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 07-templates-settings 07-03-PLAN.md
-last_updated: "2026-04-14T16:50:43.579Z"
+stopped_at: Completed 07-templates-settings-04-PLAN.md
+last_updated: "2026-04-14T16:53:44.519Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 30
-  completed_plans: 28
-  percent: 93
+  completed_plans: 29
+  percent: 97
 ---
 
 # Project State
@@ -73,6 +73,7 @@ Progress: [██████████] 100%
 | Phase 07-templates-settings P01 | 8min | 2 tasks | 3 files |
 | Phase 07-templates-settings P02 | 1 | 2 tasks | 2 files |
 | Phase 07-templates-settings P03 | 8 | 1 tasks | 3 files |
+| Phase 07-templates-settings P04 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,8 @@ Recent decisions affecting current work:
 - [Phase 07-templates-settings]: No CTA button on TemplatesPage header — templates are created FROM CampaignsPage/CampaignBuilderPage, not standalone
 - [Phase 07-templates-settings]: Row actions limited to Use template + Delete only (D-04: no preview, no rename)
 - [Phase 07-templates-settings]: SaveAsTemplateModal receives campaign fields as explicit props for reusability from both CampaignsPage (Campaign type) and CampaignBuilderPage (raw form state)
+- [Phase 07-templates-settings]: useSearchParams for tab state — URL-based tabs allow direct linking; default tab (no param) shows Profile
+- [Phase 07-templates-settings]: apiKeyDirty guard — resend_api_key excluded from UPDATE unless user has typed a new value; prevents clearing key on unrelated saves
 
 ### Pending Todos
 
@@ -142,6 +145,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T16:50:43.577Z
-Stopped at: Completed 07-templates-settings 07-03-PLAN.md
+Last session: 2026-04-14T16:53:44.517Z
+Stopped at: Completed 07-templates-settings-04-PLAN.md
 Resume file: None

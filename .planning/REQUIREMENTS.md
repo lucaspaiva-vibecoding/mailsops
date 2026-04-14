@@ -86,7 +86,7 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 - [x] **SETT-01**: User can update workspace settings: company name, timezone, default sender name and email
 - [x] **SETT-02**: User can configure and save their Resend API key
-- [ ] **SETT-03**: User can view the active sending domain (shared Resend domain displayed)
+- [x] **SETT-03**: User can view the active sending domain (shared Resend domain displayed)
 - [x] **SETT-04**: User can configure unsubscribe footer text included in all outgoing emails
 
 ## v2 Requirements
@@ -184,7 +184,7 @@ Deferred — not in current roadmap.
 | TMPL-04 | Phase 7 — Templates & Settings | Complete |
 | SETT-01 | Phase 7 — Templates & Settings | Complete |
 | SETT-02 | Phase 7 — Templates & Settings | Complete |
-| SETT-03 | Phase 7 — Templates & Settings | Pending |
+| SETT-03 | Phase 7 — Templates & Settings | Complete |
 | SETT-04 | Phase 7 — Templates & Settings | Complete |
 
 **Coverage:**
