@@ -550,22 +550,25 @@ const handleSubmit = async (e: FormEvent) => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `ProfilePage.tsx` be deleted or reused as the Profile tab component?**
    - What we know: ProfilePage.tsx contains all the Profile tab content (full name, company name, timezone, email, workspace ID). It currently renders at `/settings/profile`.
    - What's unclear: The planner must choose between (a) keeping ProfilePage as a standalone component and rendering it inside SettingsPage's Profile tab, or (b) inlining its JSX into SettingsPage.
    - Recommendation: Keep ProfilePage as a reusable component and render it as the Profile tab's content. This minimizes diff and reuse is idiomatic in this codebase.
+   - RESOLVED: Plan 04 inlines ProfilePage JSX verbatim into SettingsPage Profile tab directly (inline approach chosen for single-component simplicity).
 
 2. **Delete confirmation for templates — window.confirm or modal?**
    - What we know: CampaignsPage uses `window.confirm()` for delete (lines 74-76). CampaignsPage also marks this as discretionary in the CONTEXT (Claude's Discretion).
    - What's unclear: User hasn't specified.
    - Recommendation: Follow the established `window.confirm()` pattern from CampaignsPage for consistency. No need for a modal.
+   - RESOLVED: Plan 02 uses `window.confirm()` matching the CampaignsPage precedent.
 
 3. **Should `unsubscribe_footer_text` default be set?**
    - What we know: The column is new; no existing value exists for current users.
    - What's unclear: Whether a hardcoded default or null is preferable.
    - Recommendation: Set `DEFAULT 'To unsubscribe from future emails, click here: {{unsubscribe_url}}'` in the migration. Existing users get a sensible placeholder on the Integrations tab.
+   - RESOLVED: Plan 01 SQL migration sets `DEFAULT 'To unsubscribe from future emails, click here: {{unsubscribe_url}}'`.
 
 ---
 
