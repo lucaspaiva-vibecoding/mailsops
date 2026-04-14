@@ -53,7 +53,7 @@ Source: Verified from `CampaignsPage.tsx`, `ProfilePage.tsx`, `Card.tsx`.
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.5 | `text-sm font-medium` |
+| Label | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Heading (card) | 14px | 600 (semibold) | 1.2 | `text-sm font-semibold` |
 | Page title | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
 
@@ -63,6 +63,7 @@ Notes:
 - Muted/tertiary info (date, subtext): `text-xs text-gray-500` or `text-sm text-gray-400`
 - Monospace (workspace ID): `font-mono text-xs text-gray-500`
 - Table headers: `text-xs font-semibold text-gray-400 uppercase tracking-wide`
+- Two weights only: 400 (regular) and 600 (semibold). `font-medium` (500) is NOT used in this phase.
 
 Source: Verified from `ProfilePage.tsx`, `CampaignsPage.tsx`, `AppLayout.tsx`.
 
@@ -89,7 +90,7 @@ All components for this phase come from the existing UI library — no new primi
 
 | Component | File | Usage in this Phase |
 |-----------|------|---------------------|
-| Button | `src/components/ui/Button.tsx` | Save actions (primary), Cancel (secondary), ghost icon triggers (MoreHorizontal), danger delete button |
+| Button | `src/components/ui/Button.tsx` | Save actions (primary), Discard (secondary), ghost icon triggers (MoreHorizontal), danger delete button |
 | Card | `src/components/ui/Card.tsx` | Settings tab section wrappers, Templates table container |
 | Input | `src/components/ui/Input.tsx` | All settings form fields (full name, company, sender name, sender email, API key), template name modal field |
 | Badge | `src/components/ui/Badge.tsx` | "Active" label on sending domain (variant: success) |
@@ -112,6 +113,8 @@ New components to build (no external dependency):
 
 Layout: `flex flex-col gap-6` — matches CampaignsPage exactly.
 
+**Focal point:** The table body (`<tbody>`) is the primary focal zone. The first column (template name, `text-sm font-semibold text-gray-100`) draws the eye down the list. All other columns (subject, date, actions) are subordinate. No competing focal elements on this page — the header row is intentionally de-emphasized (`text-xs font-semibold text-gray-400 uppercase tracking-wide`).
+
 Structure:
 1. Page header row: `flex items-center justify-between`
    - Left: `<h1 className="text-xl font-semibold text-gray-100">Templates</h1>`
@@ -127,7 +130,7 @@ Table columns:
 | Template name | auto | left | `text-sm font-semibold text-gray-100` |
 | Subject line | auto | left | `text-sm text-gray-300` |
 | Date saved | auto | left | `text-sm text-gray-400` |
-| Actions | `w-12` | center | Ghost `MoreHorizontal` button |
+| Actions | `w-12` | center | Ghost `MoreHorizontal` button with `aria-label="Template actions"` |
 
 Row actions dropdown (same pattern as CampaignsPage):
 - "Use template" — `text-sm text-gray-200 hover:bg-gray-700`
@@ -139,11 +142,13 @@ Source: D-01, D-02, D-03, D-04 from CONTEXT.md. Pattern: `CampaignsPage.tsx` ver
 
 Layout: `max-w-2xl flex flex-col gap-6` — matches ProfilePage container width.
 
+**Focal point:** The primary input card for the active tab is the focal zone. Specifically: on the Profile tab, the "Personal Information" card's first input (full name) is the primary focal element. On the Workspace tab, the "Sending Defaults" card's first input (default sender name) is the primary focal element. On the Integrations tab, the "Resend Integration" card's API key input is the primary focal element. Tab navigation is a secondary element and must not visually compete with the active card.
+
 Structure:
 1. Tab navigation strip: `flex gap-0 border-b border-gray-800 mb-6`
    - Three tabs: Profile, Workspace, Integrations
-   - Active tab: `border-b-2 border-indigo-500 text-indigo-400 font-medium text-sm px-4 py-2.5 -mb-px`
-   - Inactive tab: `border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-medium text-sm px-4 py-2.5 -mb-px`
+   - Active tab: `border-b-2 border-indigo-500 text-indigo-400 font-semibold text-sm px-4 py-2.5 -mb-px`
+   - Inactive tab: `border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-semibold text-sm px-4 py-2.5 -mb-px`
 2. Tab content area: conditionally rendered based on `?tab=` param
 
 **Profile tab** — existing ProfilePage content migrated verbatim:
@@ -164,7 +169,7 @@ Structure:
     - When key exists: `placeholder="••••••••••••••••"`, value empty, `autoComplete="off"`
     - When no key: `placeholder="sk_live_..."`, `autoComplete="off"`
   - Read-only field: "Sending domain"
-    - Label: `text-sm font-medium text-gray-300`
+    - Label: `text-sm font-semibold text-gray-300`
     - Value: `text-sm text-gray-400` with `Badge variant="success"` showing "Active"
     - Static text: "resend.dev shared domain" — no input element
   - Textarea: "Unsubscribe footer text"
@@ -184,7 +189,7 @@ Structure:
 - Title: `text-base font-semibold text-gray-100` — "Save as template"
 - Input: template name field, pre-populated with campaign name (fallback: "Untitled campaign")
 - Actions row: `flex justify-end gap-2`
-  - Cancel: `Button variant="secondary" size="md"`
+  - Discard: `Button variant="secondary" size="md"`
   - Save: `Button variant="primary" size="md" loading={saving}`
 
 Source: D-06 from CONTEXT.md. Pattern: inline modal state + existing backdrop pattern from CampaignsPage.
@@ -208,7 +213,7 @@ Source: D-06 from CONTEXT.md. Pattern: inline modal state + existing backdrop pa
 2. Dropdown shows new item: "Save as template" above "Edit" item
 3. Click sets `saveAsTemplateTarget` state to the campaign object; closes dropdown
 4. `SaveAsTemplateModal` renders with `campaign.name` pre-filled
-5. User edits name (optional), clicks "Save"
+5. User edits name (optional), clicks "Save template"
 6. `createTemplate()` is called; button shows loading spinner
 7. On success: modal closes, Toast "Template saved." (success)
 8. On error: Toast with error message (error); modal stays open
@@ -277,7 +282,7 @@ Source: window.confirm pattern — verified from `CampaignsPage.tsx` line 75.
 | Modal title | "Save as template" |
 | Input label | "Template name" |
 | Primary CTA | "Save template" |
-| Cancel | "Cancel" |
+| Dismiss | "Discard" |
 
 ### SettingsPage
 
