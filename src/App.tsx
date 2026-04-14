@@ -15,6 +15,9 @@ import { CampaignBuilderPage } from './pages/campaigns/CampaignBuilderPage'
 import { CampaignAnalyticsPage } from './pages/campaigns/CampaignAnalyticsPage'
 import { AbTestBuilderPage } from './pages/campaigns/AbTestBuilderPage'
 import { AbTestResultsPage } from './pages/campaigns/AbTestResultsPage'
+import { SequencesPage } from './pages/sequences/SequencesPage'
+import { SequenceBuilderPage } from './pages/sequences/SequenceBuilderPage'
+import { SequenceResultsPage } from './pages/sequences/SequenceResultsPage'
 
 export default function App() {
   return (
@@ -41,6 +44,10 @@ export default function App() {
                 <Route path="/campaigns/:id/ab-results" element={<AbTestResultsPage />} />
                 <Route path="/campaigns/:id/edit" element={<CampaignBuilderPage />} />
                 <Route path="/campaigns/:id/analytics" element={<CampaignAnalyticsPage />} />
+                <Route path="/sequences" element={<SequencesPage />} />
+                <Route path="/sequences/new" element={<SequenceBuilderPage />} />
+                <Route path="/sequences/:id/edit" element={<SequenceBuilderPage />} />
+                <Route path="/sequences/:id/results" element={<SequenceResultsPage />} />
                 <Route path="/templates" element={<PlaceholderPage title="Templates" />} />
                 <Route path="/analytics" element={<PlaceholderPage title="Analytics" />} />
                 <Route path="/settings/profile" element={<ProfilePage />} />
