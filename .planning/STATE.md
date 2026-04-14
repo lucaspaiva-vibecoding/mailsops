@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-sequences-01-PLAN.md
-last_updated: "2026-04-14T13:48:09.231Z"
+stopped_at: Completed 06-sequences-02-PLAN.md
+last_updated: "2026-04-14T13:52:53.851Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 21
-  percent: 84
+  completed_plans: 22
+  percent: 88
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 ## Current Position
 
 Phase: 06 (sequences) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-14
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100%
 | Phase 05-a-b-testing P02 | 4min | 2 tasks | 3 files |
 | Phase 05-a-b-testing P03 | 2min | 2 tasks | 3 files |
 | Phase 06-sequences P01 | 3min | 2 tasks | 11 files |
+| Phase 06-sequences P02 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase 06-sequences]: sequence_step_sends bridge table chosen over JSONB metadata in campaign_recipients for cleaner per-step stats queries
 - [Phase 06-sequences]: saveSteps uses delete-all + bulk insert pattern for simplicity and clean reordering
 - [Phase 06-sequences]: campaign_id made nullable on campaign_recipients so sequence step sends can reuse tracking infrastructure without FK violation
+- [Phase 06-sequences]: StepEditorPanel owns its own useEditor instance — each step mounts independently, solving hooks-in-loops problem
+- [Phase 06-sequences]: Create mode step insert uses supabase directly — useSequence hook requires an id which doesn't exist until createSequence resolves
 
 ### Pending Todos
 
@@ -122,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T13:48:09.228Z
-Stopped at: Completed 06-sequences-01-PLAN.md
+Last session: 2026-04-14T13:52:53.849Z
+Stopped at: Completed 06-sequences-02-PLAN.md
 Resume file: None
