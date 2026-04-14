@@ -1,5 +1,15 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import LinkExtension from '@tiptap/extension-link'
+import ImageExtension from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
+import Color from '@tiptap/extension-color'
+import TextAlign from '@tiptap/extension-text-align'
+import { VariableChipNode } from '../../components/campaigns/VariableChipNode'
+import { VariableSlashCommand } from '../../components/campaigns/VariableSlashCommand'
+import { CampaignEditorToolbar } from '../../components/campaigns/CampaignEditorToolbar'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../../components/ui/Button'
@@ -47,6 +57,24 @@ export function SettingsPage() {
   const [unsubscribeFooter, setUnsubscribeFooter] = useState('')
   const [integrationsLoading, setIntegrationsLoading] = useState(false)
 
+  // Signature editor — one-time population guard
+  const signaturePopulated = useRef(false)
+
+  // Signature TipTap editor
+  const signatureEditor = useEditor({
+    extensions: [
+      StarterKit,
+      LinkExtension.configure({ openOnClick: false }),
+      ImageExtension,
+      Placeholder.configure({ placeholder: 'Add your signature\u2026' }),
+      VariableChipNode,
+      VariableSlashCommand,
+      Color,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: '',
+  })
+
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name ?? '')
@@ -56,8 +84,17 @@ export function SettingsPage() {
       setDefaultSenderEmail(profile.default_sender_email ?? '')
       setUnsubscribeFooter(profile.unsubscribe_footer_text ?? 'To unsubscribe from future emails, click here: {{unsubscribe_url}}')
       setApiKeyExists(!!profile.resend_api_key)
+
+      // Populate signature editor once (guard prevents re-population on profile refresh)
+      if (signatureEditor && !signaturePopulated.current && profile.signature_json) {
+        signatureEditor.commands.setContent(profile.signature_json as Record<string, unknown>)
+        signaturePopulated.current = true
+      } else if (signatureEditor && !signaturePopulated.current && profile.signature_html) {
+        signatureEditor.commands.setContent(profile.signature_html)
+        signaturePopulated.current = true
+      }
     }
-  }, [profile])
+  }, [profile, signatureEditor])
 
   const handleProfileSave = async (e: FormEvent) => {
     e.preventDefault()
@@ -79,11 +116,15 @@ export function SettingsPage() {
   const handleWorkspaceSave = async (e: FormEvent) => {
     e.preventDefault()
     setWorkspaceLoading(true)
+    const sigHtml = signatureEditor?.getHTML()
+    const isEmptySig = !sigHtml || sigHtml === '<p></p>'
     const { error } = await supabase
       .from('profiles')
       .update({
         default_sender_name: defaultSenderName || null,
         default_sender_email: defaultSenderEmail || null,
+        signature_html: isEmptySig ? null : sigHtml,
+        signature_json: isEmptySig ? null : (signatureEditor?.getJSON() ?? null),
         updated_at: new Date().toISOString(),
       })
       .eq('id', user?.id ?? '')
@@ -219,30 +260,49 @@ export function SettingsPage() {
 
       {/* Workspace tab */}
       {activeTab === 'workspace' && (
-        <Card>
-          <h2 className="text-sm font-semibold text-gray-100 mb-4">Sending Defaults</h2>
-          <form onSubmit={handleWorkspaceSave} className="flex flex-col gap-4">
-            <Input
-              label="Default sender name"
-              type="text"
-              placeholder="Your Company"
-              value={defaultSenderName}
-              onChange={(e) => setDefaultSenderName(e.target.value)}
-              icon={<User className="w-4 h-4" />}
-            />
-            <Input
-              label="Default sender email"
-              type="email"
-              placeholder="hello@yourcompany.com"
-              value={defaultSenderEmail}
-              onChange={(e) => setDefaultSenderEmail(e.target.value)}
-              icon={<Mail className="w-4 h-4" />}
-            />
-            <div className="flex justify-end pt-2">
-              <Button type="submit" loading={workspaceLoading}>Save changes</Button>
+        <form onSubmit={handleWorkspaceSave} className="flex flex-col gap-6">
+          <Card>
+            <h2 className="text-sm font-semibold text-gray-100 mb-4">Sending Defaults</h2>
+            <div className="flex flex-col gap-4">
+              <Input
+                label="Default sender name"
+                type="text"
+                placeholder="Your Company"
+                value={defaultSenderName}
+                onChange={(e) => setDefaultSenderName(e.target.value)}
+                icon={<User className="w-4 h-4" />}
+              />
+              <Input
+                label="Default sender email"
+                type="email"
+                placeholder="hello@yourcompany.com"
+                value={defaultSenderEmail}
+                onChange={(e) => setDefaultSenderEmail(e.target.value)}
+                icon={<Mail className="w-4 h-4" />}
+              />
             </div>
-          </form>
-        </Card>
+          </Card>
+
+          <Card>
+            <h2 className="text-sm font-semibold text-gray-100 mb-1">Email Signature</h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Appended below every email you send. Supports formatting and personalization variables.
+            </p>
+            {signatureEditor && (
+              <div className="border border-gray-700 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                <CampaignEditorToolbar editor={signatureEditor} />
+                <EditorContent
+                  editor={signatureEditor}
+                  className="min-h-[120px] p-4 text-gray-100 text-sm leading-relaxed bg-gray-900 focus:outline-none prose prose-invert prose-sm max-w-none"
+                />
+              </div>
+            )}
+          </Card>
+
+          <div className="flex justify-end">
+            <Button type="submit" loading={workspaceLoading}>Save workspace settings</Button>
+          </div>
+        </form>
       )}
 
       {/* Integrations tab */}
