@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, MoreHorizontal, Mail, Upload } from 'lucide-react'
+import { Plus, MoreHorizontal, Mail, Upload, FlaskConical } from 'lucide-react'
 import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
@@ -9,7 +9,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { Spinner } from '../../components/ui/Spinner'
 import { ImportCampaignsModal } from '../../components/campaigns/ImportCampaignsModal'
-import type { CampaignStatus } from '../../types/database'
+import type { CampaignStatus, Campaign } from '../../types/database'
 
 const statusBadgeVariant: Record<CampaignStatus, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
   draft: 'default',
@@ -55,9 +55,13 @@ export function CampaignsPage() {
     }
   }, [openMenuId])
 
-  const handleRowClick = (e: React.MouseEvent, campaignId: string) => {
+  const handleRowClick = (e: React.MouseEvent, campaign: Campaign) => {
     if ((e.target as HTMLElement).closest('[data-no-list-click]')) return
-    navigate(`/campaigns/${campaignId}/edit`)
+    if (campaign.campaign_type === 'ab_test') {
+      navigate(`/campaigns/${campaign.id}/ab-test/edit`)
+    } else {
+      navigate(`/campaigns/${campaign.id}/edit`)
+    }
   }
 
   const handleDuplicate = async (id: string) => {
@@ -89,6 +93,10 @@ export function CampaignsPage() {
           <Button variant="secondary" size="md" onClick={() => setShowImportModal(true)}>
             <Upload size={16} />
             Import Campaigns
+          </Button>
+          <Button variant="secondary" size="md" onClick={() => navigate('/campaigns/ab-test/new')}>
+            <FlaskConical size={16} />
+            New A/B test
           </Button>
           <Button variant="primary" size="md" onClick={() => navigate('/campaigns/new')}>
             <Plus size={16} />
@@ -138,16 +146,23 @@ export function CampaignsPage() {
                 {campaigns.map((campaign) => (
                   <tr
                     key={campaign.id}
-                    onClick={(e) => handleRowClick(e, campaign.id)}
+                    onClick={(e) => handleRowClick(e, campaign)}
                     className="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer"
                   >
                     <td className="px-4 py-3 text-sm font-semibold text-gray-100">
                       {campaign.name}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={statusBadgeVariant[campaign.status]}>
-                        {statusLabel[campaign.status]}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={statusBadgeVariant[campaign.status]}>
+                          {statusLabel[campaign.status]}
+                        </Badge>
+                        {campaign.campaign_type === 'ab_test' && (
+                          <Badge className="bg-teal-900/50 text-teal-400">
+                            A/B Test
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
                       {campaign.contact_list_id
@@ -176,6 +191,18 @@ export function CampaignsPage() {
                           ref={menuRef}
                           className="absolute right-4 top-full mt-1 z-20 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 min-w-[140px]"
                         >
+                          {campaign.campaign_type === 'ab_test' && (campaign.status === 'sent' || campaign.status === 'sending') && (
+                            <button
+                              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setOpenMenuId(null)
+                                navigate(`/campaigns/${campaign.id}/ab-results`)
+                              }}
+                            >
+                              View A/B results
+                            </button>
+                          )}
                           {campaign.status === 'sent' && (
                             <button
                               className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
@@ -193,7 +220,7 @@ export function CampaignsPage() {
                             onClick={(e) => {
                               e.stopPropagation()
                               setOpenMenuId(null)
-                              navigate(`/campaigns/${campaign.id}/edit`)
+                              navigate(campaign.campaign_type === 'ab_test' ? `/campaigns/${campaign.id}/ab-test/edit` : `/campaigns/${campaign.id}/edit`)
                             }}
                           >
                             Edit
