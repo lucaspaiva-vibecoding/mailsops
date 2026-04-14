@@ -6,6 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+function injectSignature(bodyHtml: string, signatureHtml: string | null): string {
+  if (!signatureHtml) return bodyHtml
+  const hr = '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />'
+  return `${bodyHtml}${hr}${signatureHtml}`
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -35,6 +41,19 @@ serve(async (req) => {
       })
     }
 
+    // Fetch sender's signature from profile (server-side per D-09 — not from request body)
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+    const { data: senderProfile } = await adminClient
+      .from('profiles')
+      .select('signature_html')
+      .eq('id', user.id)
+      .single()
+
+    const signatureHtml = senderProfile?.signature_html ?? null
+
     const { to, subject, body_html, from_name, from_email, preview_text } = await req.json()
 
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
@@ -56,7 +75,7 @@ serve(async (req) => {
         from: `${from_name} <${from_email}>`,
         to: [to],
         subject: subject || '(no subject)',
-        html: body_html || '<p>No content</p>',
+        html: injectSignature(body_html || '<p>No content</p>', signatureHtml),
         text: preview_text || undefined,
       }),
     })

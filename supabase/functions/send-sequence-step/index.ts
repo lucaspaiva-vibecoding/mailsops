@@ -66,6 +66,12 @@ function addUnsubscribeFooter(html: string, trackingId: string, baseUrl: string)
   return html + footer
 }
 
+function injectSignature(bodyHtml: string, signatureHtml: string | null): string {
+  if (!signatureHtml) return bodyHtml
+  const hr = '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />'
+  return `${bodyHtml}${hr}${signatureHtml}`
+}
+
 // ── Main handler ──
 
 Deno.serve(async (req) => {
@@ -99,6 +105,23 @@ Deno.serve(async (req) => {
 
     // 2. Create admin client with service_role for all DB operations
     const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
+
+    // 2a. Cache signature_html per workspace_id to avoid repeated lookups
+    const signatureCache = new Map<string, string | null>()
+
+    async function getSignatureForWorkspace(workspaceId: string): Promise<string | null> {
+      if (signatureCache.has(workspaceId)) {
+        return signatureCache.get(workspaceId) ?? null
+      }
+      const { data: senderProfile } = await adminClient
+        .from('profiles')
+        .select('signature_html')
+        .eq('workspace_id', workspaceId)
+        .single()
+      const sig = senderProfile?.signature_html ?? null
+      signatureCache.set(workspaceId, sig)
+      return sig
+    }
 
     // 3. Query due enrollments: status='active', next_send_at <= now(), limit 100
     // Join sequences (to check sequence status + get sender settings) and contacts (to check active status + get email)
@@ -172,10 +195,13 @@ Deno.serve(async (req) => {
         continue
       }
 
-      // 4d. Prepare the email — personalize, wrap links, inject tracking
+      // 4d. Prepare the email — personalize, inject signature, wrap links, inject tracking
       const trackingId = crypto.randomUUID()
-      const personalizedHtml = personalizeHtml(step.body_html, contact)
-      const { html: wrappedHtml, linkMap } = wrapLinks(personalizedHtml, trackingId, TRACKING_BASE)
+      const signatureHtml = await getSignatureForWorkspace(seq.workspace_id)
+      const personalizedBody = personalizeHtml(step.body_html, contact)
+      const personalizedSig = signatureHtml ? personalizeHtml(signatureHtml, contact) : null
+      const bodyWithSignature = injectSignature(personalizedBody, personalizedSig)
+      const { html: wrappedHtml, linkMap } = wrapLinks(bodyWithSignature, trackingId, TRACKING_BASE)
       const htmlWithUnsub = addUnsubscribeFooter(wrappedHtml, trackingId, TRACKING_BASE)
       const finalHtml = injectPixel(htmlWithUnsub, trackingId, TRACKING_BASE)
       const personalizedSubject = personalizeText(step.subject, contact)
