@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: A/B Testing** - Create variant campaigns, set split percentages, compare results, and send the winning variant
 - [x] **Phase 6: Sequences** - Build multi-step drip campaigns with time-based delays and per-step delivery stats (completed 2026-04-14)
 - [ ] **Phase 7: Templates & Settings** - Save reusable templates from campaigns and configure workspace/Resend settings
+- [ ] **Phase 8: Email Signature & Rich HTML Body** - Persistent email signature in Settings, text color picker, and text alignment in toolbar
 
 ## Phase Details
 
@@ -158,10 +159,30 @@ Plans:
 
 **UI hint**: yes
 
+### Phase 8: Email Signature & Rich HTML Body
+**Goal**: Users can define a persistent email signature and use text color and alignment formatting in all editors
+**Depends on**: Phase 7
+**Requirements**: SIG-01, SIG-02, SIG-03, SIG-04, SIG-05, CLR-01, ALN-01
+**Success Criteria** (what must be TRUE):
+  1. User can create and edit a rich-text email signature in the Settings Workspace tab
+  2. Signature is automatically injected into all outgoing emails (campaigns, sequences, test sends)
+  3. Signature appears in the campaign preview panel with an hr separator
+  4. User can apply text color from a preset palette of 8 email-safe colors in the editor toolbar
+  5. User can set text alignment (left, center, right) in the editor toolbar
+**Plans**: 4 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — DB migration (signature columns), TipTap extension installs, TypeScript types, toolbar color picker + alignment buttons
+- [ ] 08-02-PLAN.md — Signature editor in Settings Workspace tab, CampaignPreview signature display, builder preview wiring
+- [ ] 08-03-PLAN.md — Edge Function signature injection (send-campaign, send-sequence-step, send-test-email)
+- [ ] 08-04-PLAN.md — [BLOCKING] Schema push + build/lint verification + smoke test
+
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -172,13 +193,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 5. A/B Testing | 0/3 | Not started | - |
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
 | 7. Templates & Settings | 4/5 | In Progress|  |
-
-### Phase 8: Email Signature & Rich HTML Body
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 7
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd-plan-phase 8 to break down)
+| 8. Email Signature & Rich HTML Body | 0/4 | Not started | - |
