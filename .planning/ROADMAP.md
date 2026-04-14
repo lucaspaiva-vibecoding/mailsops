@@ -109,7 +109,13 @@ Plans:
   2. User can set the split percentage between variants before sending
   3. User can view open rate and click rate side-by-side for each variant
   4. User can pick a winning variant and send it to the remaining unsent contacts
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — DB migration (campaign_type + parent_campaign_id), TypeScript types, useAbTest hook, useCampaigns extensions, Edge Function contact_ids override, route wiring
+- [ ] 05-02-PLAN.md — A/B test builder page: VariantTabStrip, SplitPercentageInput, dual TipTap editors, save/send flow
+- [ ] 05-03-PLAN.md — A/B test results page with side-by-side stats, SendWinnerModal, CampaignsPage integration (button, badge, routing)
+
 **UI hint**: yes
 
 ### Phase 6: Sequences
@@ -147,6 +153,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Campaign Builder | 2/4 | In Progress|  |
 | 3. Email Delivery Engine | 0/5 | Not started | - |
 | 4. Analytics & Dashboard | 2/3 | In Progress|  |
-| 5. A/B Testing | 0/? | Not started | - |
+| 5. A/B Testing | 0/3 | Not started | - |
 | 6. Sequences | 0/? | Not started | - |
 | 7. Templates & Settings | 0/? | Not started | - |
