@@ -31,6 +31,7 @@ export const VariableSlashCommand = Extension.create<VariableSlashCommandOptions
           let popup: HTMLDivElement | null = null
           let selectedIndex = 0
           let items: VariableItem[] = []
+          let commandFn: ((item: VariableItem) => void) | null = null
 
           const updateSelection = () => {
             if (!popup) return
@@ -48,6 +49,7 @@ export const VariableSlashCommand = Extension.create<VariableSlashCommandOptions
             onStart: (props) => {
               items = props.items as VariableItem[]
               selectedIndex = 0
+              commandFn = props.command as unknown as (item: VariableItem) => void
 
               popup = document.createElement('div')
               popup.className = 'bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-50 min-w-[180px]'
@@ -130,8 +132,8 @@ export const VariableSlashCommand = Extension.create<VariableSlashCommandOptions
                 return true
               }
               if (props.event.key === 'Enter') {
-                if (items[selectedIndex]) {
-                  props.command(items[selectedIndex])
+                if (items[selectedIndex] && commandFn) {
+                  commandFn(items[selectedIndex])
                 }
                 return true
               }

@@ -61,6 +61,8 @@ export interface ContactImportLog {
 export type ContactInsert = Omit<Contact, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 export type ContactUpdate = Partial<Omit<Contact, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
+export type CampaignType = 'regular' | 'ab_test' | 'ab_variant'
+
 export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled'
 
 export interface Campaign {
@@ -88,12 +90,22 @@ export interface Campaign {
   total_bounced: number
   total_unsubscribed: number
   settings: Record<string, unknown>
+  campaign_type: CampaignType
+  parent_campaign_id: string | null
   created_at: string
   updated_at: string
   deleted_at: string | null
 }
 
-export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_sent' | 'total_delivered' | 'total_opened' | 'total_clicked' | 'total_replied' | 'total_bounced' | 'total_unsubscribed' | 'created_at' | 'updated_at' | 'deleted_at' | 'sent_at'>
+export interface AbTestSettings {
+  split_percentage: number
+  hold_back_contact_ids?: string[]
+}
+
+export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_sent' | 'total_delivered' | 'total_opened' | 'total_clicked' | 'total_replied' | 'total_bounced' | 'total_unsubscribed' | 'created_at' | 'updated_at' | 'deleted_at' | 'sent_at' | 'campaign_type' | 'parent_campaign_id'> & {
+  campaign_type?: CampaignType
+  parent_campaign_id?: string | null
+}
 
 export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
