@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Email Delivery Engine** - Send campaigns via Resend API with open/click/unsubscribe tracking via Edge Functions
 - [ ] **Phase 4: Analytics & Dashboard** - Per-campaign analytics, event timeline, link breakdown, recipient engagement, and account-wide dashboard
 - [ ] **Phase 5: A/B Testing** - Create variant campaigns, set split percentages, compare results, and send the winning variant
-- [ ] **Phase 6: Sequences** - Build multi-step drip campaigns with time-based delays and per-step delivery stats
+- [x] **Phase 6: Sequences** - Build multi-step drip campaigns with time-based delays and per-step delivery stats (completed 2026-04-14)
 - [ ] **Phase 7: Templates & Settings** - Save reusable templates from campaigns and configure workspace/Resend settings
 
 ## Phase Details
@@ -134,7 +134,7 @@ Plans:
 - [x] 06-02-PLAN.md — Sequence builder page: StepEditorPanel (TipTap per step), StartSequenceModal, shared settings, save/start flow
 - [x] 06-03-PLAN.md — send-sequence-step Edge Function (pg_cron triggered, Resend send, tracking, enrollment advancement)
 - [x] 06-04-PLAN.md — Sequences list page (table + actions) + Results page (enrollment count + per-step stats)
-- [ ] 06-05-PLAN.md — [BLOCKING] Schema push to live Supabase + full build/lint verification
+- [x] 06-05-PLAN.md — [BLOCKING] Schema push to live Supabase + full build/lint verification
 
 **UI hint**: yes
 
@@ -162,5 +162,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Email Delivery Engine | 0/5 | Not started | - |
 | 4. Analytics & Dashboard | 2/3 | In Progress|  |
 | 5. A/B Testing | 0/3 | Not started | - |
-| 6. Sequences | 4/5 | In Progress|  |
+| 6. Sequences | 5/5 | Complete   | 2026-04-14 |
 | 7. Templates & Settings | 0/? | Not started | - |
