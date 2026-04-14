@@ -77,17 +77,17 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 ### Template Library (Module 9)
 
-- [ ] **TMPL-01**: User can save any campaign as a reusable template
-- [ ] **TMPL-02**: User can browse saved templates with name preview
+- [x] **TMPL-01**: User can save any campaign as a reusable template
+- [x] **TMPL-02**: User can browse saved templates with name preview
 - [ ] **TMPL-03**: User can create a new campaign pre-filled from a selected template
-- [ ] **TMPL-04**: User can delete templates they no longer need
+- [x] **TMPL-04**: User can delete templates they no longer need
 
 ### Settings & Integrations (Module 10)
 
-- [ ] **SETT-01**: User can update workspace settings: company name, timezone, default sender name and email
-- [ ] **SETT-02**: User can configure and save their Resend API key
+- [x] **SETT-01**: User can update workspace settings: company name, timezone, default sender name and email
+- [x] **SETT-02**: User can configure and save their Resend API key
 - [ ] **SETT-03**: User can view the active sending domain (shared Resend domain displayed)
-- [ ] **SETT-04**: User can configure unsubscribe footer text included in all outgoing emails
+- [x] **SETT-04**: User can configure unsubscribe footer text included in all outgoing emails
 
 ## v2 Requirements
 
@@ -178,14 +178,14 @@ Deferred — not in current roadmap.
 | SEQN-02 | Phase 6 — Sequences | Complete |
 | SEQN-03 | Phase 6 — Sequences | Complete |
 | SEQN-04 | Phase 6 — Sequences | Complete |
-| TMPL-01 | Phase 7 — Templates & Settings | Pending |
-| TMPL-02 | Phase 7 — Templates & Settings | Pending |
+| TMPL-01 | Phase 7 — Templates & Settings | Complete |
+| TMPL-02 | Phase 7 — Templates & Settings | Complete |
 | TMPL-03 | Phase 7 — Templates & Settings | Pending |
-| TMPL-04 | Phase 7 — Templates & Settings | Pending |
-| SETT-01 | Phase 7 — Templates & Settings | Pending |
-| SETT-02 | Phase 7 — Templates & Settings | Pending |
+| TMPL-04 | Phase 7 — Templates & Settings | Complete |
+| SETT-01 | Phase 7 — Templates & Settings | Complete |
+| SETT-02 | Phase 7 — Templates & Settings | Complete |
 | SETT-03 | Phase 7 — Templates & Settings | Pending |
-| SETT-04 | Phase 7 — Templates & Settings | Pending |
+| SETT-04 | Phase 7 — Templates & Settings | Complete |
 
 **Coverage:**
 - v1 requirements: 49 total
