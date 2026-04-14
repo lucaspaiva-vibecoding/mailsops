@@ -73,7 +73,7 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 - [x] **SEQN-01**: User can create a sequence with multiple email steps, each with its own subject, body, and delay
 - [x] **SEQN-02**: User can assign a contact list to a sequence to enroll all active contacts
 - [x] **SEQN-03**: System sends each sequence step automatically after the configured delay (e.g., Day 1, Day 3, Day 7)
-- [ ] **SEQN-04**: User can view per-sequence enrollment count and per-step delivery/open stats
+- [x] **SEQN-04**: User can view per-sequence enrollment count and per-step delivery/open stats
 
 ### Template Library (Module 9)
 
@@ -177,7 +177,7 @@ Deferred — not in current roadmap.
 | SEQN-01 | Phase 6 — Sequences | Complete |
 | SEQN-02 | Phase 6 — Sequences | Complete |
 | SEQN-03 | Phase 6 — Sequences | Complete |
-| SEQN-04 | Phase 6 — Sequences | Pending |
+| SEQN-04 | Phase 6 — Sequences | Complete |
 | TMPL-01 | Phase 7 — Templates & Settings | Pending |
 | TMPL-02 | Phase 7 — Templates & Settings | Pending |
 | TMPL-03 | Phase 7 — Templates & Settings | Pending |

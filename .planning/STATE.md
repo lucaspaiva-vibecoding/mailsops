@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-sequences-03-PLAN.md Task 1; awaiting human action on Task 2 (deploy Edge Function + configure secrets + pg_cron)
-last_updated: "2026-04-14T13:56:20.793Z"
+stopped_at: Completed 06-sequences-04-PLAN.md (all tasks done)
+last_updated: "2026-04-14T14:00:06.537Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 23
-  percent: 92
+  completed_plans: 24
+  percent: 96
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 ## Current Position
 
 Phase: 06 (sequences) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-14
 
@@ -68,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 06-sequences P01 | 3min | 2 tasks | 11 files |
 | Phase 06-sequences P02 | 2min | 2 tasks | 3 files |
 | Phase 06-sequences P03 | 4min | 1 tasks | 1 files |
+| Phase 06-sequences P04 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,8 @@ Recent decisions affecting current work:
 - [Phase 06-sequences]: Create mode step insert uses supabase directly — useSequence hook requires an id which doesn't exist until createSequence resolves
 - [Phase 06-sequences]: Dual auth on send-sequence-step: x-internal-secret header (pg_cron path) OR Authorization Bearer (manual testing) — both validated against SEQUENCE_CRON_SECRET
 - [Phase 06-sequences]: Sequential enrollment processing for idempotency: each enrollment advanced immediately after successful send to prevent duplicate sends on crash
+- [Phase 06-sequences]: SequencesPage step/enrollment counts fetched via parallel .in() queries after sequences load — avoids N+1 by batching
+- [Phase 06-sequences]: SequenceResultsPage per-step stats aggregated client-side from sequence_step_sends rows keyed by step_number — consistent with analytics page pattern
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T13:56:20.790Z
-Stopped at: Completed 06-sequences-03-PLAN.md Task 1; awaiting human action on Task 2 (deploy Edge Function + configure secrets + pg_cron)
+Last session: 2026-04-14T14:00:06.535Z
+Stopped at: Completed 06-sequences-04-PLAN.md (all tasks done)
 Resume file: None
