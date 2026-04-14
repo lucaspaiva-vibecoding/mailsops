@@ -25,7 +25,7 @@ const navItems = [
   { to: '/sequences', icon: Workflow, label: 'Sequences' },
   { to: '/templates', icon: FileText, label: 'Templates' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-  { to: '/settings/profile', icon: Settings, label: 'Settings' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 export function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onCloseMobile }: SidebarProps) {

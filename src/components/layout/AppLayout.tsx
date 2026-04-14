@@ -10,7 +10,7 @@ const pageTitles: Record<string, string> = {
   '/sequences': 'Sequences',
   '/templates': 'Templates',
   '/analytics': 'Analytics',
-  '/settings/profile': 'Profile Settings',
+  '/settings': 'Settings',
 }
 
 export function AppLayout() {

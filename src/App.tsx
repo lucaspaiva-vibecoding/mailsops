@@ -7,7 +7,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { SignupPage } from './pages/auth/SignupPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
-import { ProfilePage } from './pages/settings/ProfilePage'
+import { SettingsPage } from './pages/settings/SettingsPage'
 import { ContactsPage } from './pages/contacts/ContactsPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { CampaignsPage } from './pages/campaigns/CampaignsPage'
@@ -51,7 +51,8 @@ export default function App() {
                 <Route path="/sequences/:id/results" element={<SequenceResultsPage />} />
                 <Route path="/templates" element={<TemplatesPage />} />
                 <Route path="/analytics" element={<PlaceholderPage title="Analytics" />} />
-                <Route path="/settings/profile" element={<ProfilePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/settings/profile" element={<Navigate to="/settings" replace />} />
               </Route>
             </Route>
 
