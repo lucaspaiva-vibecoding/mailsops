@@ -4,6 +4,8 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
+import Color from '@tiptap/extension-color'
+import TextAlign from '@tiptap/extension-text-align'
 import { ChevronUp, ChevronDown, X } from 'lucide-react'
 import { VariableChipNode } from '../campaigns/VariableChipNode'
 import { VariableSlashCommand } from '../campaigns/VariableSlashCommand'
@@ -57,6 +59,8 @@ export function StepEditorPanel({
       Placeholder.configure({ placeholder: 'Write your email content here...' }),
       VariableChipNode,
       VariableSlashCommand,
+      Color,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
     content: step.bodyJson ?? step.bodyHtml ?? '',
     onUpdate: ({ editor: e }) => {

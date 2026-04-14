@@ -5,6 +5,8 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
+import Color from '@tiptap/extension-color'
+import TextAlign from '@tiptap/extension-text-align'
 import { VariableChipNode } from '../../components/campaigns/VariableChipNode'
 import { VariableSlashCommand } from '../../components/campaigns/VariableSlashCommand'
 import { CampaignEditorToolbar } from '../../components/campaigns/CampaignEditorToolbar'
@@ -67,6 +69,8 @@ export function CampaignBuilderPage() {
       Placeholder.configure({ placeholder: 'Write your email content here...' }),
       VariableChipNode,
       VariableSlashCommand,
+      Color,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
     content: '',
     onUpdate: () => setDirty(true),

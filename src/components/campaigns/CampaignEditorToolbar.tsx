@@ -1,11 +1,22 @@
 import { useState } from 'react'
 import { Editor } from '@tiptap/react'
-import { Bold, Italic, Heading1, Heading2, List, Link2, Image } from 'lucide-react'
+import { Bold, Italic, Heading1, Heading2, List, Link2, Image, AlignLeft, AlignCenter, AlignRight, Palette } from 'lucide-react'
 import { VariableDropdown } from './VariableDropdown'
 
 interface CampaignEditorToolbarProps {
   editor: Editor
 }
+
+const COLOR_PALETTE = [
+  { label: 'Black', hex: '#000000' },
+  { label: 'Dark gray', hex: '#374151' },
+  { label: 'Red', hex: '#dc2626' },
+  { label: 'Orange', hex: '#ea580c' },
+  { label: 'Yellow', hex: '#ca8a04' },
+  { label: 'Green', hex: '#16a34a' },
+  { label: 'Blue', hex: '#2563eb' },
+  { label: 'Purple', hex: '#7c3aed' },
+]
 
 function ToolbarButton({ active, onClick, children, ariaLabel }: {
   active?: boolean
@@ -36,6 +47,7 @@ function Divider() {
 export function CampaignEditorToolbar({ editor }: CampaignEditorToolbarProps) {
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false)
   const [imagePopoverOpen, setImagePopoverOpen] = useState(false)
+  const [colorPickerOpen, setColorPickerOpen] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
   const [imageUrl, setImageUrl] = useState('')
 
@@ -102,6 +114,30 @@ export function CampaignEditorToolbar({ editor }: CampaignEditorToolbarProps) {
       <Divider />
 
       <ToolbarButton
+        ariaLabel="Align left"
+        active={editor.isActive({ textAlign: 'left' })}
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+      >
+        <AlignLeft size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        ariaLabel="Align center"
+        active={editor.isActive({ textAlign: 'center' })}
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+      >
+        <AlignCenter size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        ariaLabel="Align right"
+        active={editor.isActive({ textAlign: 'right' })}
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+      >
+        <AlignRight size={16} />
+      </ToolbarButton>
+
+      <Divider />
+
+      <ToolbarButton
         ariaLabel="Bullet list"
         active={editor.isActive('bulletList')}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -114,16 +150,23 @@ export function CampaignEditorToolbar({ editor }: CampaignEditorToolbarProps) {
       <ToolbarButton
         ariaLabel="Insert link"
         active={editor.isActive('link')}
-        onClick={() => { setLinkPopoverOpen(!linkPopoverOpen); setImagePopoverOpen(false) }}
+        onClick={() => { setLinkPopoverOpen(!linkPopoverOpen); setImagePopoverOpen(false); setColorPickerOpen(false) }}
       >
         <Link2 size={16} />
       </ToolbarButton>
       <ToolbarButton
         ariaLabel="Insert image"
         active={false}
-        onClick={() => { setImagePopoverOpen(!imagePopoverOpen); setLinkPopoverOpen(false) }}
+        onClick={() => { setImagePopoverOpen(!imagePopoverOpen); setLinkPopoverOpen(false); setColorPickerOpen(false) }}
       >
         <Image size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        ariaLabel="Text color"
+        active={!!editor.getAttributes('textStyle').color}
+        onClick={() => { setColorPickerOpen(!colorPickerOpen); setLinkPopoverOpen(false); setImagePopoverOpen(false) }}
+      >
+        <Palette size={16} />
       </ToolbarButton>
 
       <Divider />
@@ -171,6 +214,32 @@ export function CampaignEditorToolbar({ editor }: CampaignEditorToolbarProps) {
           >
             Insert image
           </button>
+        </div>
+      )}
+
+      {/* Color picker popover */}
+      {colorPickerOpen && (
+        <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-3 z-20">
+          <div className="grid grid-cols-4 gap-1">
+            {COLOR_PALETTE.map((color) => {
+              const isActive = editor.getAttributes('textStyle').color === color.hex
+              return (
+                <button
+                  key={color.hex}
+                  type="button"
+                  aria-label={`${color.label} \u2014 ${color.hex}`}
+                  onClick={() => {
+                    editor.chain().focus().setColor(color.hex).run()
+                    setColorPickerOpen(false)
+                  }}
+                  className={`w-5 h-5 rounded cursor-pointer transition-all ${
+                    isActive ? 'ring-2 ring-indigo-400' : 'ring-1 ring-gray-600 hover:ring-indigo-400'
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                />
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
