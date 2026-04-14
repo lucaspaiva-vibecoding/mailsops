@@ -112,7 +112,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — DB migration (campaign_type + parent_campaign_id), TypeScript types, useAbTest hook, useCampaigns extensions, Edge Function contact_ids override, route wiring
+- [x] 05-01-PLAN.md — DB migration (campaign_type + parent_campaign_id), TypeScript types, useAbTest hook, useCampaigns extensions, Edge Function contact_ids override, route wiring
 - [ ] 05-02-PLAN.md — A/B test builder page: VariantTabStrip, SplitPercentageInput, dual TipTap editors, save/send flow
 - [ ] 05-03-PLAN.md — A/B test results page with side-by-side stats, SendWinnerModal, CampaignsPage integration (button, badge, routing)
 
