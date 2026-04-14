@@ -66,6 +66,12 @@ function addUnsubscribeFooter(html: string, trackingId: string, baseUrl: string)
   return html + footer
 }
 
+function injectSignature(bodyHtml: string, signatureHtml: string | null): string {
+  if (!signatureHtml) return bodyHtml
+  const hr = '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />'
+  return `${bodyHtml}${hr}${signatureHtml}`
+}
+
 // --- Main handler ---
 
 Deno.serve(async (req) => {
@@ -112,7 +118,7 @@ Deno.serve(async (req) => {
     // 4. Get user's workspace_id
     const { data: profile, error: profileError } = await adminClient
       .from('profiles')
-      .select('workspace_id')
+      .select('workspace_id, signature_html')
       .eq('id', user.id)
       .single()
 
@@ -124,6 +130,7 @@ Deno.serve(async (req) => {
     }
 
     const workspaceId = profile.workspace_id
+    const signatureHtml = profile.signature_html ?? null
 
     // 5. Load campaign
     const { data: campaign, error: campaignError } = await adminClient
@@ -258,9 +265,11 @@ Deno.serve(async (req) => {
       const preparedEmails = batch.map((contact: any) => {
         const trackingId = crypto.randomUUID()
 
-        // CRITICAL ORDER: personalize FIRST, then wrap links, then unsub footer, then pixel
-        const personalizedHtml = personalizeHtml(campaign.body_html, contact)
-        const { html: wrappedHtml, linkMap } = wrapLinks(personalizedHtml, trackingId, TRACKING_BASE)
+        // CRITICAL ORDER: personalize FIRST (body + signature), inject signature, then wrap links, then unsub footer, then pixel
+        const personalizedBody = personalizeHtml(campaign.body_html, contact)
+        const personalizedSig = signatureHtml ? personalizeHtml(signatureHtml, contact) : null
+        const bodyWithSignature = injectSignature(personalizedBody, personalizedSig)
+        const { html: wrappedHtml, linkMap } = wrapLinks(bodyWithSignature, trackingId, TRACKING_BASE)
         const htmlWithUnsub = addUnsubscribeFooter(wrappedHtml, trackingId, TRACKING_BASE)
         const finalHtml = injectPixel(htmlWithUnsub, trackingId, TRACKING_BASE)
         const personalizedSubject = personalizeText(campaign.subject, contact)
