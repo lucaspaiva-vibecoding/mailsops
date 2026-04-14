@@ -54,8 +54,7 @@ Source: established from existing pages (`CampaignsPage.tsx`, `AbTestBuilderPage
 
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
-| Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.4 | `text-sm font-medium` |
+| Body + Labels | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Section heading | 12px | 600 (semibold) | 1.2 | `text-xs font-semibold uppercase tracking-wide` |
 | Page heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
 
@@ -64,6 +63,7 @@ Notes:
 - Section headings always uppercase with `tracking-wide` — matches existing `Details`, `Shared Settings`, etc. sections
 - TipTap editor body uses `text-sm leading-relaxed` (`leading-relaxed` = 1.625)
 - Inline-editable sequence name input: `text-xl font-semibold` matching `CampaignBuilderPage` pattern
+- Only two weights are in use: 400 (regular) for all body copy and labels, 600 (semibold) for headings and strong emphasis
 
 Source: extracted from `CampaignBuilderPage.tsx`, `AbTestBuilderPage.tsx`, `AbTestResultsPage.tsx`.
 
@@ -187,10 +187,11 @@ Each step panel is a `Card` with `padding="md"`:
 Card (border border-gray-700 rounded-lg p-6)
   ├── Step header row (flex items-center justify-between mb-4)
   │     ├── Step number badge (w-7 h-7 rounded-full bg-gray-800 text-gray-300 text-xs font-semibold)
-  │     │   + label "Step N" (text-sm font-medium text-gray-300 ml-2)
-  │     └── Remove button (X icon, ghost, size sm) — hidden if only 1 step
+  │     │   + label "Step N" (text-sm text-gray-300 ml-2)
+  │     └── Reorder buttons (ChevronUp / ChevronDown, ghost size sm, aria-label="Move step up" / "Move step down")
+  │         + Remove button (X icon, ghost, size sm, aria-label="Remove step {N}") — hidden if only 1 step
   ├── Delay input row (flex items-center gap-2 mb-4)
-  │     ├── label "Send on day" (text-sm font-medium text-gray-300)
+  │     ├── label "Send on day" (text-sm text-gray-300)
   │     ├── number input (w-20 bg-gray-800 border-gray-700 text-gray-100 text-sm rounded-lg px-3 py-2)
   │     └── "(days after enrollment)" (text-sm text-gray-400)
   ├── Subject row with variable button (same pattern as CampaignBuilderPage subject + {{ }} button)
@@ -275,7 +276,7 @@ Not `window.confirm`. Uses a custom modal matching `SendWinnerModal` pattern.
 Modal content:
 - Heading: "Start this sequence?"
 - Body: "This will enroll {N} active contacts from {list name}. Emails will begin sending automatically. Contacts added after this point will not be enrolled."
-- Actions: `[Cancel (secondary)]` `[Start Sequence (primary, loading state)]`
+- Actions: `[Keep Editing (secondary)]` `[Start Sequence (primary, loading state)]`
 
 ### Pause / Resume — Inline confirmation
 
@@ -294,6 +295,17 @@ Only available on draft sequences with no enrollments. Sequences with any enroll
 - Results page: `<Spinner size="lg" />` centered `py-24`
 - Save draft button: `loading` prop on Button (spinner inline)
 - Start Sequence button: `loading` prop on Button
+
+### Accessibility: Icon-only Button Labels
+
+Every icon-only interactive element must declare an explicit `aria-label`:
+
+| Element | Icon | `aria-label` |
+|---------|------|-------------|
+| Sequence row actions button | `MoreHorizontal` | `aria-label="Sequence actions"` |
+| Step remove button | `X` | `aria-label="Remove step {N}"` (interpolated) |
+| Step move-up button | `ChevronUp` | `aria-label="Move step up"` |
+| Step move-down button | `ChevronDown` | `aria-label="Move step down"` |
 
 ### Error States
 
@@ -326,7 +338,7 @@ Only available on draft sequences with no enrollments. Sequences with any enroll
 | Start modal — heading | "Start this sequence?" |
 | Start modal — body | "This will enroll {N} active contacts from {list name}. Emails will begin sending automatically. Contacts added after this point will not be enrolled." |
 | Start modal — confirm | "Start Sequence" |
-| Start modal — cancel | "Cancel" |
+| Start modal — dismiss | "Keep Editing" |
 | Section label — builder settings | "Sequence Settings" |
 | Section label — builder steps | "Steps" |
 | Step header | "Step {N}" |
