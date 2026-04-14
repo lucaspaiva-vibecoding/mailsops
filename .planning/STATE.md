@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 07-templates-settings-04-PLAN.md
-last_updated: "2026-04-14T16:53:44.519Z"
-last_activity: 2026-04-14
+status: complete
+stopped_at: Phase 7 complete — all plans executed, smoke test approved
+last_updated: "2026-04-14T17:35:00.000Z"
+last_activity: 2026-04-14 -- Phase 7 execution complete, milestone v1.0 done
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 30
-  completed_plans: 29
-  percent: 97
+  completed_plans: 30
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** Marketers can send targeted email campaigns and see exactly who opened, clicked, or replied — without leaving the app.
-**Current focus:** Phase 06 — sequences
+**Current focus:** Phase 07 — templates & settings — COMPLETE (milestone v1.0 done)
 
 ## Current Position
 
-Phase: 06 (sequences) — EXECUTING
+Phase: 07 (templates-settings) — COMPLETE
 Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-04-14
+Status: All 7 phases complete — milestone v1.0 done
+Last activity: 2026-04-14 -- Phase 7 smoke test approved
 
 Progress: [██████████] 100%
 
@@ -134,6 +134,10 @@ Recent decisions affecting current work:
 - [Phase 07-templates-settings]: SaveAsTemplateModal receives campaign fields as explicit props for reusability from both CampaignsPage (Campaign type) and CampaignBuilderPage (raw form state)
 - [Phase 07-templates-settings]: useSearchParams for tab state — URL-based tabs allow direct linking; default tab (no param) shows Profile
 - [Phase 07-templates-settings]: apiKeyDirty guard — resend_api_key excluded from UPDATE unless user has typed a new value; prevents clearing key on unrelated saves
+
+### Roadmap Evolution
+
+- Phase 8 added: Email Signature & Rich HTML Body
 
 ### Pending Todos
 
