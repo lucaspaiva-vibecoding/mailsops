@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 07-templates-settings-07-01-PLAN.md
-last_updated: "2026-04-14T16:44:45.069Z"
+stopped_at: Completed 07-templates-settings 07-02-PLAN.md
+last_updated: "2026-04-14T16:47:21.368Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 30
-  completed_plans: 26
-  percent: 87
+  completed_plans: 27
+  percent: 90
 ---
 
 # Project State
@@ -71,6 +71,7 @@ Progress: [██████████] 100%
 | Phase 06-sequences P04 | 2min | 2 tasks | 2 files |
 | Phase 06-sequences P05 | 5min | 1 tasks | 0 files |
 | Phase 07-templates-settings P01 | 8min | 2 tasks | 3 files |
+| Phase 07-templates-settings P02 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,8 @@ Recent decisions affecting current work:
 - [Phase 07-templates-settings]: New templates table (not reusing campaigns) — static content snapshots, no delivery lifecycle columns needed
 - [Phase 07-templates-settings]: Four new columns on profiles (not workspace_settings table) — workspace=user at MVP; avoids JOIN; matches existing company_name/timezone pattern
 - [Phase 07-templates-settings]: createTemplate injects workspace_id from profile.workspace_id — defense-in-depth vs T-07-01 (workspace_id tampering)
+- [Phase 07-templates-settings]: No CTA button on TemplatesPage header — templates are created FROM CampaignsPage/CampaignBuilderPage, not standalone
+- [Phase 07-templates-settings]: Row actions limited to Use template + Delete only (D-04: no preview, no rename)
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T16:44:45.067Z
-Stopped at: Completed 07-templates-settings-07-01-PLAN.md
+Last session: 2026-04-14T16:47:21.366Z
+Stopped at: Completed 07-templates-settings 07-02-PLAN.md
 Resume file: None
