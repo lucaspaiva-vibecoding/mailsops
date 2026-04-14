@@ -130,7 +130,7 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — DB migration (4 tables + RLS), TypeScript types, data hooks (useSequences/useSequence), sidebar nav, route wiring
+- [x] 06-01-PLAN.md — DB migration (4 tables + RLS), TypeScript types, data hooks (useSequences/useSequence), sidebar nav, route wiring
 - [ ] 06-02-PLAN.md — Sequence builder page: StepEditorPanel (TipTap per step), StartSequenceModal, shared settings, save/start flow
 - [ ] 06-03-PLAN.md — send-sequence-step Edge Function (pg_cron triggered, Resend send, tracking, enrollment advancement)
 - [ ] 06-04-PLAN.md — Sequences list page (table + actions) + Results page (enrollment count + per-step stats)

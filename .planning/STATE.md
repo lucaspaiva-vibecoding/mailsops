@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 05-a-b-testing-03-PLAN.md
-last_updated: "2026-04-14T02:20:07.218Z"
+status: executing
+stopped_at: Completed 06-sequences-01-PLAN.md
+last_updated: "2026-04-14T13:48:09.231Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_plans: 25
+  completed_plans: 21
+  percent: 84
 ---
 
 # Project State
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** Marketers can send targeted email campaigns and see exactly who opened, clicked, or replied — without leaving the app.
-**Current focus:** Phase 03 — email-delivery-engine
+**Current focus:** Phase 06 — sequences
 
 ## Current Position
 
-Phase: 04 (analytics-dashboard) — COMPLETE
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 06 (sequences) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-04-14
 
 Progress: [██████████] 100%
@@ -65,6 +65,7 @@ Progress: [██████████] 100%
 | Phase 05-a-b-testing P01 | 25min | 3 tasks | 9 files |
 | Phase 05-a-b-testing P02 | 4min | 2 tasks | 3 files |
 | Phase 05-a-b-testing P03 | 2min | 2 tasks | 3 files |
+| Phase 06-sequences P01 | 3min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,9 @@ Recent decisions affecting current work:
 - [Phase 05-a-b-testing]: contact_ids override on send-campaign Edge Function — surgical 1-branch change, keeps delivery logic in Edge Function
 - [Phase 05-a-b-testing]: dirtyA/dirtyB tracking removed — TypeScript noUnusedLocals flags state vars set but never read in JSX; no beforeunload guard in scope for A/B builder page
 - [Phase 05-a-b-testing]: AbTestSettings cast via unknown intermediate resolves TS2352 overlap error on JSONB Record<string, unknown> to typed interface casts
+- [Phase 06-sequences]: sequence_step_sends bridge table chosen over JSONB metadata in campaign_recipients for cleaner per-step stats queries
+- [Phase 06-sequences]: saveSteps uses delete-all + bulk insert pattern for simplicity and clean reordering
+- [Phase 06-sequences]: campaign_id made nullable on campaign_recipients so sequence step sends can reuse tracking infrastructure without FK violation
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T02:20:07.216Z
-Stopped at: Completed 05-a-b-testing-03-PLAN.md
+Last session: 2026-04-14T13:48:09.228Z
+Stopped at: Completed 06-sequences-01-PLAN.md
 Resume file: None
