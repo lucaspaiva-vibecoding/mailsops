@@ -9,6 +9,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Card } from '../../components/ui/Card'
 import { Spinner } from '../../components/ui/Spinner'
 import { ImportCampaignsModal } from '../../components/campaigns/ImportCampaignsModal'
+import { SaveAsTemplateModal } from '../../components/templates/SaveAsTemplateModal'
 import type { CampaignStatus, Campaign } from '../../types/database'
 
 const statusBadgeVariant: Record<CampaignStatus, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
@@ -36,6 +37,7 @@ export function CampaignsPage() {
   const { lists } = useContactLists()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [showImportModal, setShowImportModal] = useState(false)
+  const [saveAsTemplateTarget, setSaveAsTemplateTarget] = useState<Campaign | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   const listMap = Object.fromEntries(lists.map((l) => [l.id, l.name]))
@@ -191,6 +193,16 @@ export function CampaignsPage() {
                           ref={menuRef}
                           className="absolute right-4 top-full mt-1 z-20 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 min-w-[140px]"
                         >
+                          <button
+                            className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setOpenMenuId(null)
+                              setSaveAsTemplateTarget(campaign)
+                            }}
+                          >
+                            Save as template
+                          </button>
                           {campaign.campaign_type === 'ab_test' && (campaign.status === 'sent' || campaign.status === 'sending') && (
                             <button
                               className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
@@ -258,6 +270,19 @@ export function CampaignsPage() {
         onClose={() => setShowImportModal(false)}
         onImportComplete={() => { setShowImportModal(false); refetch() }}
       />
+      {saveAsTemplateTarget && (
+        <SaveAsTemplateModal
+          defaultName={saveAsTemplateTarget.name}
+          subject={saveAsTemplateTarget.subject}
+          previewText={saveAsTemplateTarget.preview_text ?? ''}
+          fromName={saveAsTemplateTarget.from_name}
+          fromEmail={saveAsTemplateTarget.from_email}
+          bodyHtml={saveAsTemplateTarget.body_html}
+          bodyJson={saveAsTemplateTarget.body_json}
+          onClose={() => setSaveAsTemplateTarget(null)}
+          onSaved={() => setSaveAsTemplateTarget(null)}
+        />
+      )}
     </div>
   )
 }

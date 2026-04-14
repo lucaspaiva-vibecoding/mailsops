@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
@@ -20,11 +20,14 @@ import { useCampaign } from '../../hooks/campaigns/useCampaign'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
 import { supabase } from '../../lib/supabase'
+import { SaveAsTemplateModal } from '../../components/templates/SaveAsTemplateModal'
 import type { CampaignStatus } from '../../types/database'
 
 export function CampaignBuilderPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const fromTemplateId = searchParams.get('from_template')
   const { showToast } = useToast()
 
   // Data hooks
@@ -48,6 +51,7 @@ export function CampaignBuilderPage() {
   const [sending, setSending] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [populated, setPopulated] = useState(false)
+  const [showSaveAsTemplate, setShowSaveAsTemplate] = useState(false)
 
   // Subject variable insertion
   const subjectInputRef = useRef<HTMLInputElement>(null)
@@ -95,6 +99,28 @@ export function CampaignBuilderPage() {
       setPopulated(true)
     }
   }, [campaign, editor, populated])
+
+  // Populate form from template (new campaign from template via ?from_template param)
+  useEffect(() => {
+    if (fromTemplateId && !populated && editor) {
+      supabase
+        .from('templates')
+        .select('*')
+        .eq('id', fromTemplateId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setSubject(data.subject ?? '')
+            setFromName(data.from_name ?? '')
+            setFromEmail(data.from_email ?? '')
+            setPreviewText(data.preview_text ?? '')
+            if (data.body_json) editor.commands.setContent(data.body_json)
+            else if (data.body_html) editor.commands.setContent(data.body_html)
+            setPopulated(true)
+          }
+        })
+    }
+  }, [fromTemplateId, populated, editor])
 
   // beforeunload guard (D-23)
   useEffect(() => {
@@ -258,6 +284,12 @@ export function CampaignBuilderPage() {
         campaignIdToSend = newCampaign.id
         // Invoke send-campaign directly with the new campaign ID
         const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          showToast('Session expired. Please refresh the page.', 'error')
+          setSending(false)
+          navigate(`/campaigns/${campaignIdToSend}/edit`, { replace: true })
+          return
+        }
         const { data, error: invokeError } = await supabase.functions.invoke('send-campaign', {
           body: { campaign_id: campaignIdToSend },
           headers: { Authorization: `Bearer ${session?.access_token}` },
@@ -357,6 +389,14 @@ export function CampaignBuilderPage() {
           aria-describedby={errors.name ? 'name-error' : undefined}
         />
         <div className="flex gap-2 shrink-0">
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => setShowSaveAsTemplate(true)}
+            type="button"
+          >
+            Save as template
+          </Button>
           <Button
             variant="secondary"
             size="sm"
@@ -597,6 +637,19 @@ export function CampaignBuilderPage() {
           {sendButtonLabel}
         </Button>
       </div>
+      {showSaveAsTemplate && (
+        <SaveAsTemplateModal
+          defaultName={name || 'Untitled campaign'}
+          subject={subject}
+          previewText={previewText}
+          fromName={fromName}
+          fromEmail={fromEmail}
+          bodyHtml={editor?.getHTML() ?? ''}
+          bodyJson={editor?.getJSON() ?? null}
+          onClose={() => setShowSaveAsTemplate(false)}
+          onSaved={() => setShowSaveAsTemplate(false)}
+        />
+      )}
     </div>
   )
 }
