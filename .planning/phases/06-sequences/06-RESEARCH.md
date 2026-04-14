@@ -885,7 +885,7 @@ Deno.serve(async (req) => {
 })
 ```
 
-**IMPORTANT NOTE on campaign_id usage:** The `campaign_recipients` table has a NOT NULL FK to `campaigns(id)`. Sequence step sends cannot insert with `sequence_id` as `campaign_id` because `sequences` is a separate table. Two options: (a) create a nullable `sequence_step_send_id` column on `campaign_recipients` and set `campaign_id` to NULL, or (b) add a nullable `sequence_id` FK column to `campaign_recipients`. See the "Open Questions" section for resolution guidance.
+**IMPORTANT NOTE on campaign_id usage (RESOLVED):** The `campaign_recipients` table originally had a NOT NULL FK on `campaign_id` to `campaigns(id)`. This has been resolved in migration 008_sequences.sql which includes: `ALTER TABLE public.campaign_recipients ALTER COLUMN campaign_id DROP NOT NULL;` and `ALTER TABLE public.campaign_recipients ADD COLUMN sequence_id UUID REFERENCES public.sequences(id);`. For sequence step sends, insert with `campaign_id: null` and `sequence_id: enrollment.sequence_id`. The existing tracking function (`t`) looks up by `tracking_id` only, so tracking works regardless.
 
 ---
 
@@ -910,26 +910,28 @@ Deno.serve(async (req) => {
 | A2 | limit(100) per cron invocation is sufficient for typical sequence scales | Pattern 3 Core Logic | Medium — if workspace has 1000+ active enrollments per hour, processing will lag by hours. Could increase limit or add pagination in future |
 | A3 | Client-side bulk insert for startSequence (no Edge Function needed) | Pattern 6 | Low — works for contact list sizes up to a few thousand; Supabase PostgREST handles array inserts efficiently |
 | A4 | `processing_at` idempotency lock is LOW risk for hourly cron | Pitfall 6 | Low — concurrent cron invocations are not expected given hourly schedule and typical sequence sizes |
-| A5 | `campaign_id` FK constraint on `campaign_recipients` prevents direct use of `sequence_id` | Code Examples (send-sequence-step) | HIGH — this is a critical open question that the planner must resolve before writing the Edge Function plan |
+| A5 | `campaign_id` FK constraint on `campaign_recipients` prevents direct use of `sequence_id` | Code Examples (send-sequence-step) | RESOLVED — migration 008 makes campaign_id nullable and adds sequence_id FK column. Sequence sends use campaign_id: null, sequence_id: enrollment.sequence_id. |
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **campaign_recipients.campaign_id FK constraint for sequence step tracking**
    - What we know: `campaign_recipients` has `campaign_id UUID NOT NULL REFERENCES campaigns(id)`. The `sequences` table is separate from `campaigns`.
    - What's unclear: How should sequence step sends populate this column? Three options: (a) Make `campaign_id` nullable in a new migration; (b) Add `sequence_id` FK column to campaign_recipients (nullable); (c) Don't use `campaign_recipients` for sequence tracking — use only `sequence_step_sends` and a lightweight separate table, giving up the open/click tracking from the `t` function.
-   - Recommendation: Option (b) — add `sequence_step_id UUID REFERENCES sequence_steps(id)` to campaign_recipients as a nullable column. When populated (sequence context), `campaign_id` can be NULL. This requires a small migration addendum. The existing `t` function looks up by `tracking_id` (not `campaign_id`), so tracking still works. This is the least-invasive approach. Include in migration 008 as: `ALTER TABLE campaign_recipients ADD COLUMN sequence_step_id UUID REFERENCES public.sequence_steps(id);`
+   - Recommendation: Combined option (a) + (b).
+   - **RESOLVED:** Migration 008_sequences.sql includes both: `ALTER TABLE public.campaign_recipients ALTER COLUMN campaign_id DROP NOT NULL;` AND `ALTER TABLE public.campaign_recipients ADD COLUMN sequence_id UUID REFERENCES public.sequences(id);`. For sequence step sends, the Edge Function inserts with `campaign_id: null` and `sequence_id: enrollment.sequence_id`. The `t` tracking function looks up by `tracking_id` only, so existing open/click/unsub tracking continues to work.
 
 2. **pg_cron + Vault: Can migration include cron.schedule if Vault secrets don't exist yet?**
    - What we know: `cron.schedule` SQL references `vault.decrypted_secrets` at runtime (not at schedule creation time). The schedule is created successfully even if the vault secret doesn't exist yet — it will fail at runtime.
    - What's unclear: Whether this is acceptable (fail silently) or if there's a better pattern.
    - Recommendation: Include `cron.schedule()` in the migration. Document that Vault secrets must be created before the first cron job runs. Add a `user_setup` block in the plan with the exact vault commands.
+   - **RESOLVED:** Plan 03 Task 2 (checkpoint:human-action) separates cron.schedule creation from the migration. The migration only creates tables and extensions. The cron schedule is created manually via SQL Editor after Edge Function deployment and Vault secret configuration. This avoids any ordering issues.
 
 3. **Internal secret for send-sequence-step (using anon key as bearer)**
-   - What we know: The official Supabase pattern uses the anon key in the Authorization header for pg_cron → Edge Function calls. With `verify_jwt: false`, the function doesn't validate the JWT — anyone with the anon key (which is public) could call it.
+   - What we know: The official Supabase pattern uses the anon key in the Authorization header for pg_cron -> Edge Function calls. With `verify_jwt: false`, the function doesn't validate the JWT — anyone with the anon key (which is public) could call it.
    - What's unclear: Whether additional security (internal secret header) is needed for a function that only performs internal DB operations and doesn't expose data.
-   - Recommendation: For this project's threat model (internal function, no PII returned, only sends emails from your own workspace data), using the anon key without an additional secret is acceptable. The function is protected by the service_role key being server-side only. This matches the existing `t` and `resend-webhook` pattern (verify_jwt: false, no extra secret). [ASSUMED]
+   - **RESOLVED:** Plan 03 implements a dedicated SEQUENCE_CRON_SECRET for internal auth. The Edge Function checks `x-internal-secret` header (for pg_cron via pg_net) OR `Authorization: Bearer` token (for manual curl testing) against the secret. This is more secure than the anon-key-only approach. The secret is stored in Supabase Vault (encrypted at rest) and Supabase secrets (env var). Documented in threat model as T-6-08 and T-6-12.
 
 ---
 
