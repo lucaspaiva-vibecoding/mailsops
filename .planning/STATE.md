@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-03-PLAN.md
-last_updated: "2026-04-14T23:22:38.521Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-04-14T23:22:57.829Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 34
-  completed_plans: 32
-  percent: 94
+  completed_plans: 33
+  percent: 97
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 ## Current Position
 
 Phase: 08 (email-signature-rich-html-body) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-14
 
@@ -76,6 +76,7 @@ Progress: [██████████] 100%
 | Phase 07-templates-settings P04 | 2 | 2 tasks | 4 files |
 | Phase 08 P01 | 3min | 2 tasks | 6 files |
 | Phase 08 P03 | 3min | 2 tasks | 3 files |
+| Phase 08 P02 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,8 @@ Recent decisions affecting current work:
 - [Phase 08]: TextAlign configured with types: ['heading', 'paragraph'] to cover both node types
 - [Phase 08]: injectSignature duplicated across all three Edge Functions — shared Deno ESM module adds deployment complexity not justified for small helper
 - [Phase 08]: send-test-email signature fetched server-side by user.id via service_role — prevents forged signature injection (T-08-05)
+- [Phase 08]: signaturePopulated useRef guard prevents re-population when profile refreshes after save
+- [Phase 08]: isEmptySig check stores null for both signature columns instead of empty TipTap HTML
 
 ### Roadmap Evolution
 
@@ -156,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T23:22:38.519Z
-Stopped at: Completed 08-03-PLAN.md
+Last session: 2026-04-14T23:22:57.827Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
