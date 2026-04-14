@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: A/B Testing** - Create variant campaigns, set split percentages, compare results, and send the winning variant
 - [x] **Phase 6: Sequences** - Build multi-step drip campaigns with time-based delays and per-step delivery stats (completed 2026-04-14)
 - [ ] **Phase 7: Templates & Settings** - Save reusable templates from campaigns and configure workspace/Resend settings
-- [ ] **Phase 8: Email Signature & Rich HTML Body** - Persistent email signature in Settings, text color picker, and text alignment in toolbar
+- [x] **Phase 8: Email Signature & Rich HTML Body** - Persistent email signature in Settings, text color picker, and text alignment in toolbar (completed 2026-04-14)
 
 ## Phase Details
 
@@ -175,7 +175,7 @@ Plans:
 - [x] 08-01-PLAN.md — DB migration (signature columns), TipTap extension installs, TypeScript types, toolbar color picker + alignment buttons
 - [x] 08-02-PLAN.md — Signature editor in Settings Workspace tab, CampaignPreview signature display, builder preview wiring
 - [x] 08-03-PLAN.md — Edge Function signature injection (send-campaign, send-sequence-step, send-test-email)
-- [ ] 08-04-PLAN.md — [BLOCKING] Schema push + build/lint verification + smoke test
+- [x] 08-04-PLAN.md — [BLOCKING] Schema push + build/lint verification + smoke test
 
 **UI hint**: yes
 
@@ -193,4 +193,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. A/B Testing | 0/3 | Not started | - |
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
 | 7. Templates & Settings | 4/5 | In Progress|  |
-| 8. Email Signature & Rich HTML Body | 3/4 | In Progress|  |
+| 8. Email Signature & Rich HTML Body | 4/4 | Complete   | 2026-04-14 |
