@@ -18,6 +18,7 @@ import { AbTestResultsPage } from './pages/campaigns/AbTestResultsPage'
 import { SequencesPage } from './pages/sequences/SequencesPage'
 import { SequenceBuilderPage } from './pages/sequences/SequenceBuilderPage'
 import { SequenceResultsPage } from './pages/sequences/SequenceResultsPage'
+import { TemplatesPage } from './pages/templates/TemplatesPage'
 
 export default function App() {
   return (
@@ -48,7 +49,7 @@ export default function App() {
                 <Route path="/sequences/new" element={<SequenceBuilderPage />} />
                 <Route path="/sequences/:id/edit" element={<SequenceBuilderPage />} />
                 <Route path="/sequences/:id/results" element={<SequenceResultsPage />} />
-                <Route path="/templates" element={<PlaceholderPage title="Templates" />} />
+                <Route path="/templates" element={<TemplatesPage />} />
                 <Route path="/analytics" element={<PlaceholderPage title="Analytics" />} />
                 <Route path="/settings/profile" element={<ProfilePage />} />
               </Route>
