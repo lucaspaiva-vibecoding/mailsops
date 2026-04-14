@@ -79,7 +79,7 @@ Requirements for full build (Modules 2–10). Module 1 (Auth) already shipped.
 
 - [x] **TMPL-01**: User can save any campaign as a reusable template
 - [x] **TMPL-02**: User can browse saved templates with name preview
-- [ ] **TMPL-03**: User can create a new campaign pre-filled from a selected template
+- [x] **TMPL-03**: User can create a new campaign pre-filled from a selected template
 - [x] **TMPL-04**: User can delete templates they no longer need
 
 ### Settings & Integrations (Module 10)
@@ -180,7 +180,7 @@ Deferred — not in current roadmap.
 | SEQN-04 | Phase 6 — Sequences | Complete |
 | TMPL-01 | Phase 7 — Templates & Settings | Complete |
 | TMPL-02 | Phase 7 — Templates & Settings | Complete |
-| TMPL-03 | Phase 7 — Templates & Settings | Pending |
+| TMPL-03 | Phase 7 — Templates & Settings | Complete |
 | TMPL-04 | Phase 7 — Templates & Settings | Complete |
 | SETT-01 | Phase 7 — Templates & Settings | Complete |
 | SETT-02 | Phase 7 — Templates & Settings | Complete |
