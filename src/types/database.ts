@@ -5,6 +5,10 @@ export interface Profile {
   avatar_url: string | null
   company_name: string | null
   timezone: string
+  default_sender_name: string | null
+  default_sender_email: string | null
+  resend_api_key: string | null
+  unsubscribe_footer_text: string | null
   created_at: string
   updated_at: string
 }
@@ -150,6 +154,22 @@ export interface SequenceStepSend {
   workspace_id: string
   sent_at: string
 }
+
+export interface Template {
+  id: string
+  workspace_id: string
+  name: string
+  subject: string
+  preview_text: string | null
+  from_name: string
+  from_email: string
+  body_html: string
+  body_json: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}
+
+export type TemplateInsert = Omit<Template, 'id' | 'created_at' | 'updated_at'>
 
 export type SequenceInsert = Omit<Sequence, 'id' | 'created_at' | 'updated_at'>
 export type SequenceUpdate = Partial<Omit<Sequence, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>>
@@ -303,6 +323,11 @@ export interface Database {
         Row: SequenceStepSend
         Insert: Omit<SequenceStepSend, 'id' | 'sent_at'>
         Update: never
+      }
+      templates: {
+        Row: Template
+        Insert: TemplateInsert
+        Update: Partial<Omit<Template, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>>
       }
     }
   }
