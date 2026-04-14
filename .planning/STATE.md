@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 05-a-b-testing-01-PLAN.md
-last_updated: "2026-04-14T02:09:06.869Z"
+stopped_at: Completed 05-a-b-testing-02-PLAN.md
+last_updated: "2026-04-14T02:16:06.859Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -63,6 +63,7 @@ Progress: [██████████] 100%
 | Phase 04 P01 | 20m | 2 tasks | 4 files |
 | Phase 04-analytics-dashboard P03 | 10m | 2 tasks | 3 files |
 | Phase 05-a-b-testing P01 | 25min | 3 tasks | 9 files |
+| Phase 05-a-b-testing P02 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,8 @@ Recent decisions affecting current work:
 - [Phase 04-analytics-dashboard]: Used StatCard from Plan 02 directly with matching interface; kept View all campaigns as plain button; placed secondary info line between stat cards and Recent Campaigns
 - [Phase 05-a-b-testing]: Hold-back contacts stored in parent campaign settings JSONB (hold_back_contact_ids array) — avoids new RecipientStatus value
 - [Phase 05-a-b-testing]: contact_ids override on send-campaign Edge Function — surgical 1-branch change, keeps delivery logic in Edge Function
+- [Phase 05-a-b-testing]: dirtyA/dirtyB tracking removed — TypeScript noUnusedLocals flags state vars set but never read in JSX; no beforeunload guard in scope for A/B builder page
+- [Phase 05-a-b-testing]: AbTestSettings cast via unknown intermediate resolves TS2352 overlap error on JSONB Record<string, unknown> to typed interface casts
 
 ### Pending Todos
 
@@ -114,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T02:09:06.867Z
-Stopped at: Completed 05-a-b-testing-01-PLAN.md
+Last session: 2026-04-14T02:16:06.857Z
+Stopped at: Completed 05-a-b-testing-02-PLAN.md
 Resume file: None
