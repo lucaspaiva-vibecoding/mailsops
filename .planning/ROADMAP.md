@@ -127,7 +127,15 @@ Plans:
   2. User can assign a contact list to a sequence to enroll all active contacts
   3. Sequence steps are sent automatically after their configured delay without manual action
   4. User can view enrollment count per sequence and delivery/open stats per step
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — DB migration (4 tables + RLS), TypeScript types, data hooks (useSequences/useSequence), sidebar nav, route wiring
+- [ ] 06-02-PLAN.md — Sequence builder page: StepEditorPanel (TipTap per step), StartSequenceModal, shared settings, save/start flow
+- [ ] 06-03-PLAN.md — send-sequence-step Edge Function (pg_cron triggered, Resend send, tracking, enrollment advancement)
+- [ ] 06-04-PLAN.md — Sequences list page (table + actions) + Results page (enrollment count + per-step stats)
+- [ ] 06-05-PLAN.md — [BLOCKING] Schema push to live Supabase + full build/lint verification
+
 **UI hint**: yes
 
 ### Phase 7: Templates & Settings
@@ -154,5 +162,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Email Delivery Engine | 0/5 | Not started | - |
 | 4. Analytics & Dashboard | 2/3 | In Progress|  |
 | 5. A/B Testing | 0/3 | Not started | - |
-| 6. Sequences | 0/? | Not started | - |
+| 6. Sequences | 0/5 | Not started | - |
 | 7. Templates & Settings | 0/? | Not started | - |
