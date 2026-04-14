@@ -102,6 +102,61 @@ export interface AbTestSettings {
   hold_back_contact_ids?: string[]
 }
 
+export type SequenceStatus = 'draft' | 'active' | 'paused' | 'archived'
+export type SequenceEnrollmentStatus = 'active' | 'completed' | 'unsubscribed' | 'bounced'
+
+export interface Sequence {
+  id: string
+  workspace_id: string
+  name: string
+  status: SequenceStatus
+  contact_list_id: string | null
+  from_name: string
+  from_email: string
+  reply_to_email: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface SequenceStep {
+  id: string
+  sequence_id: string
+  step_number: number
+  delay_days: number
+  subject: string
+  body_html: string
+  body_json: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface SequenceEnrollment {
+  id: string
+  sequence_id: string
+  contact_id: string
+  workspace_id: string
+  status: SequenceEnrollmentStatus
+  current_step: number
+  enrolled_at: string
+  next_send_at: string
+  completed_at: string | null
+}
+
+export interface SequenceStepSend {
+  id: string
+  sequence_enrollment_id: string
+  sequence_step_id: string
+  campaign_recipient_id: string
+  step_number: number
+  workspace_id: string
+  sent_at: string
+}
+
+export type SequenceInsert = Omit<Sequence, 'id' | 'created_at' | 'updated_at'>
+export type SequenceUpdate = Partial<Omit<Sequence, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>>
+
+export type SequenceStepInsert = Omit<SequenceStep, 'id' | 'created_at'>
+export type SequenceStepUpdate = Partial<Omit<SequenceStep, 'id' | 'sequence_id' | 'created_at'>>
+
 export type CampaignInsert = Omit<Campaign, 'id' | 'total_recipients' | 'total_sent' | 'total_delivered' | 'total_opened' | 'total_clicked' | 'total_replied' | 'total_bounced' | 'total_unsubscribed' | 'created_at' | 'updated_at' | 'deleted_at' | 'sent_at' | 'campaign_type' | 'parent_campaign_id'> & {
   campaign_type?: CampaignType
   parent_campaign_id?: string | null
@@ -228,6 +283,26 @@ export interface Database {
         Row: CampaignLink
         Insert: Omit<CampaignLink, 'id' | 'created_at'>
         Update: Partial<Pick<CampaignLink, 'click_count' | 'unique_clicks'>>
+      }
+      sequences: {
+        Row: Sequence
+        Insert: SequenceInsert
+        Update: SequenceUpdate
+      }
+      sequence_steps: {
+        Row: SequenceStep
+        Insert: SequenceStepInsert
+        Update: SequenceStepUpdate
+      }
+      sequence_enrollments: {
+        Row: SequenceEnrollment
+        Insert: Omit<SequenceEnrollment, 'id' | 'enrolled_at' | 'completed_at'>
+        Update: Partial<Omit<SequenceEnrollment, 'id' | 'sequence_id' | 'contact_id' | 'workspace_id' | 'enrolled_at'>>
+      }
+      sequence_step_sends: {
+        Row: SequenceStepSend
+        Insert: Omit<SequenceStepSend, 'id' | 'sent_at'>
+        Update: never
       }
     }
   }
