@@ -9,6 +9,8 @@ export interface Profile {
   default_sender_email: string | null
   resend_api_key: string | null
   unsubscribe_footer_text: string | null
+  signature_html: string | null
+  signature_json: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }
