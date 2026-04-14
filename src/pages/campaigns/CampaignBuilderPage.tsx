@@ -20,6 +20,7 @@ import { Spinner } from '../../components/ui/Spinner'
 import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useCampaign } from '../../hooks/campaigns/useCampaign'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
+import { useAuth } from '../../hooks/useAuth'
 import { useToast } from '../../components/ui/Toast'
 import { supabase } from '../../lib/supabase'
 import { SaveAsTemplateModal } from '../../components/templates/SaveAsTemplateModal'
@@ -31,6 +32,7 @@ export function CampaignBuilderPage() {
   const [searchParams] = useSearchParams()
   const fromTemplateId = searchParams.get('from_template')
   const { showToast } = useToast()
+  const { profile } = useAuth()
 
   // Data hooks
   const { createCampaign } = useCampaigns()
@@ -559,7 +561,10 @@ export function CampaignBuilderPage() {
           </div>
         )}
         {mode === 'preview' && (
-          <CampaignPreview bodyHtml={editor?.getHTML() ?? ''} />
+          <CampaignPreview
+          bodyHtml={editor?.getHTML() ?? ''}
+          signatureHtml={profile?.signature_html ?? undefined}
+        />
         )}
         {errors.body && (
           <p className="text-sm text-red-400 mt-2" role="alert">

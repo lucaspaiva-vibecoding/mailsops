@@ -1,5 +1,6 @@
 interface CampaignPreviewProps {
   bodyHtml: string
+  signatureHtml?: string
 }
 
 const SAMPLE_DATA: Record<string, string> = {
@@ -12,8 +13,9 @@ function substituteVariables(html: string): string {
   return html.replace(/\{\{(\w+)\}\}/g, (_, key) => SAMPLE_DATA[key] ?? `{{${key}}}`)
 }
 
-export function CampaignPreview({ bodyHtml }: CampaignPreviewProps) {
+export function CampaignPreview({ bodyHtml, signatureHtml }: CampaignPreviewProps) {
   const substituted = substituteVariables(bodyHtml)
+  const substitutedSignature = signatureHtml ? substituteVariables(signatureHtml) : null
 
   if (!bodyHtml || bodyHtml === '<p></p>') {
     return (
@@ -30,8 +32,15 @@ export function CampaignPreview({ bodyHtml }: CampaignPreviewProps) {
       </p>
       <div
         className="max-w-[600px] w-full bg-white text-gray-900 p-8 rounded-lg shadow-xl prose"
-        dangerouslySetInnerHTML={{ __html: substituted }}
-      />
+      >
+        <div dangerouslySetInnerHTML={{ __html: substituted }} />
+        {substitutedSignature && (
+          <>
+            <hr className="my-4 border-gray-200" />
+            <div dangerouslySetInnerHTML={{ __html: substitutedSignature }} />
+          </>
+        )}
+      </div>
     </div>
   )
 }
