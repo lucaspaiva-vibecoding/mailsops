@@ -147,7 +147,15 @@ Plans:
   2. User can start a new campaign pre-filled from a saved template, and delete templates they no longer need
   3. User can update workspace settings: company name, timezone, default sender name and email
   4. User can save their Resend API key and configure the unsubscribe footer text for all outgoing emails
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — DB migration (templates table + profiles extensions), TypeScript types, useTemplates data hook
+- [ ] 07-02-PLAN.md — TemplatesPage with table layout, row actions (Use template + Delete), route wiring
+- [ ] 07-03-PLAN.md — SaveAsTemplateModal, CampaignsPage/CampaignBuilderPage entry points, template pre-fill
+- [ ] 07-04-PLAN.md — SettingsPage with Profile/Workspace/Integrations tabs, routing + sidebar updates
+- [ ] 07-05-PLAN.md — [BLOCKING] Schema push to live Supabase + build/lint verification + smoke test
+
 **UI hint**: yes
 
 ## Progress
@@ -163,4 +171,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Analytics & Dashboard | 2/3 | In Progress|  |
 | 5. A/B Testing | 0/3 | Not started | - |
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
-| 7. Templates & Settings | 0/? | Not started | - |
+| 7. Templates & Settings | 0/5 | Not started | - |
