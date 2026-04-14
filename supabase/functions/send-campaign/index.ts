@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
 
     // 2. Parse request body
     const body = await req.json()
-    const { campaign_id } = body
+    const { campaign_id, contact_ids } = body
     if (!campaign_id) {
       return new Response(JSON.stringify({ error: 'campaign_id is required' }), {
         status: 400,
@@ -163,22 +163,43 @@ Deno.serve(async (req) => {
       })
     }
 
-    // 9. Load active contacts from target list
-    const { data: members, error: membersError } = await adminClient
-      .from('contact_list_members')
-      .select('contact_id, contacts(*)')
-      .eq('contact_list_id', campaign.contact_list_id)
+    // 9. Load contacts — either from contact_ids override (A/B testing) or full list
+    let activeContacts: any[]
 
-    if (membersError) {
-      return new Response(JSON.stringify({ error: 'Failed to load contacts' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    if (Array.isArray(contact_ids) && contact_ids.length > 0) {
+      // A/B test mode: load specific contacts by ID
+      const { data: contacts, error: contactsError } = await adminClient
+        .from('contacts')
+        .select('*')
+        .in('id', contact_ids)
+        .eq('status', 'active')
+
+      if (contactsError) {
+        return new Response(JSON.stringify({ error: 'Failed to load contacts' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      activeContacts = contacts ?? []
+    } else {
+      // Regular mode: load all active contacts from target list
+      const { data: members, error: membersError } = await adminClient
+        .from('contact_list_members')
+        .select('contact_id, contacts(*)')
+        .eq('contact_list_id', campaign.contact_list_id)
+
+      if (membersError) {
+        return new Response(JSON.stringify({ error: 'Failed to load contacts' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      activeContacts = members
+        ?.map((m: any) => m.contacts)
+        .filter((c: any) => c && c.status === 'active') ?? []
     }
-
-    const activeContacts = members
-      ?.map((m: any) => m.contacts)
-      .filter((c: any) => c && c.status === 'active') ?? []
 
     if (activeContacts.length === 0) {
       return new Response(JSON.stringify({ error: 'No active contacts in target list' }), {
@@ -194,7 +215,40 @@ Deno.serve(async (req) => {
       total_recipients: activeContacts.length,
     }).eq('id', campaign_id)
 
-    // 11. Process in batches of BATCH_SIZE (50) — T-03-12 rate limiting
+    // 11. Build campaign_links rows from the template HTML (before personalization).
+    // We use the raw body_html because link URLs are the same for all recipients —
+    // personalization only changes text content, not link targets.
+    // campaign_links is the source of truth for click redirects in the t function.
+    const templateLinkMap: Record<string, string> = {}
+    let templateLinkIndex = 0
+    campaign.body_html.replace(
+      /href="(https?:\/\/[^"]+)"/g,
+      (_: string, originalUrl: string) => {
+        templateLinkMap[String(templateLinkIndex++)] = originalUrl
+        return ''
+      }
+    )
+
+    if (templateLinkIndex > 0) {
+      const campaignLinkRows = Object.entries(templateLinkMap).map(([idx, url]) => ({
+        campaign_id: campaign_id,
+        workspace_id: workspaceId,
+        original_url: url,
+        link_index: parseInt(idx, 10),
+        click_count: 0,
+        unique_clicks: 0,
+      }))
+
+      const { error: linksInsertError } = await adminClient
+        .from('campaign_links')
+        .insert(campaignLinkRows)
+
+      if (linksInsertError) {
+        console.error('[send-campaign] campaign_links insert error:', linksInsertError.message)
+      }
+    }
+
+    // 12. Process in batches of BATCH_SIZE (50) — T-03-12 rate limiting
     let totalSent = 0
 
     for (let i = 0; i < activeContacts.length; i += BATCH_SIZE) {
@@ -220,16 +274,26 @@ Deno.serve(async (req) => {
         }
       })
 
-      // b. Insert campaign_recipients rows before sending (for referential integrity)
+      // b. Insert campaign_recipients rows before sending (for referential integrity).
+      // - status: correct column name (not delivery_status)
+      // - variables: stores the link map snapshot for this recipient (not link_map)
+      // - workspace_id: required NOT NULL column
       const recipientRows = preparedEmails.map((email: any) => ({
         campaign_id: campaign_id,
         contact_id: email.contact.id,
+        workspace_id: workspaceId,
         tracking_id: email.trackingId,
-        delivery_status: 'queued',
-        link_map: email.linkMap,
+        status: 'queued',
+        variables: email.linkMap,
       }))
 
-      await adminClient.from('campaign_recipients').insert(recipientRows)
+      const { error: recipientsInsertError } = await adminClient
+        .from('campaign_recipients')
+        .insert(recipientRows)
+
+      if (recipientsInsertError) {
+        console.error('[send-campaign] campaign_recipients insert error:', recipientsInsertError.message)
+      }
 
       // c. Build Resend batch payload
       const resendBatch = preparedEmails.map((email: any) => ({
@@ -271,21 +335,28 @@ Deno.serve(async (req) => {
 
       if (!resendResponse.ok) {
         // Log error and continue to next batch (partial failure tolerance)
-        console.error(`Resend batch error: ${resendResponse.status} ${await resendResponse.text()}`)
+        console.error(`[send-campaign] Resend batch error: ${resendResponse.status} ${await resendResponse.text()}`)
         continue
       }
 
-      // Success — store resend_email_id for webhook matching
+      // Success — store resend_message_id for webhook matching.
+      // - resend_message_id: correct column name (not resend_email_id)
+      // - status: correct column name (not delivery_status)
       const { data: resendData } = await resendResponse.json()
       if (resendData) {
         for (let j = 0; j < resendData.length; j++) {
-          await adminClient.from('campaign_recipients')
+          const { error: updateError } = await adminClient
+            .from('campaign_recipients')
             .update({
-              resend_email_id: resendData[j].id,
-              delivery_status: 'sent',
+              resend_message_id: resendData[j].id,
+              status: 'sent',
               sent_at: new Date().toISOString(),
             })
             .eq('tracking_id', preparedEmails[j].trackingId)
+
+          if (updateError) {
+            console.error('[send-campaign] campaign_recipients post-send update error:', updateError.message)
+          }
         }
       }
 
@@ -297,17 +368,18 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 12. Mark campaign as sent
+    // 13. Mark campaign as sent
     await adminClient.from('campaigns').update({
       status: 'sent',
       total_sent: totalSent,
     }).eq('id', campaign_id)
 
-    // 13. Return success
+    // 14. Return success
     return new Response(JSON.stringify({ ok: true, sent: totalSent, total: activeContacts.length }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
+    console.error('[send-campaign] unhandled error:', (err as Error).message)
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

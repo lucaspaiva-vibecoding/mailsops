@@ -13,6 +13,8 @@ import { PlaceholderPage } from './pages/PlaceholderPage'
 import { CampaignsPage } from './pages/campaigns/CampaignsPage'
 import { CampaignBuilderPage } from './pages/campaigns/CampaignBuilderPage'
 import { CampaignAnalyticsPage } from './pages/campaigns/CampaignAnalyticsPage'
+import { AbTestBuilderPage } from './pages/campaigns/AbTestBuilderPage'
+import { AbTestResultsPage } from './pages/campaigns/AbTestResultsPage'
 
 export default function App() {
   return (
@@ -33,7 +35,10 @@ export default function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/contacts" element={<ContactsPage />} />
                 <Route path="/campaigns" element={<CampaignsPage />} />
+                <Route path="/campaigns/ab-test/new" element={<AbTestBuilderPage />} />
                 <Route path="/campaigns/new" element={<CampaignBuilderPage />} />
+                <Route path="/campaigns/:id/ab-test/edit" element={<AbTestBuilderPage />} />
+                <Route path="/campaigns/:id/ab-results" element={<AbTestResultsPage />} />
                 <Route path="/campaigns/:id/edit" element={<CampaignBuilderPage />} />
                 <Route path="/campaigns/:id/analytics" element={<CampaignAnalyticsPage />} />
                 <Route path="/templates" element={<PlaceholderPage title="Templates" />} />
