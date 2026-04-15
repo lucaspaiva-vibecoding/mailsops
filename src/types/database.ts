@@ -67,7 +67,15 @@ export interface ContactImportLog {
 export type ContactInsert = Omit<Contact, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>
 export type ContactUpdate = Partial<Omit<Contact, 'id' | 'workspace_id' | 'created_at' | 'updated_at' | 'deleted_at'>>
 
-export type CampaignType = 'regular' | 'ab_test' | 'ab_variant'
+export type CampaignType = 'regular' | 'ab_test' | 'ab_variant' | 'csv_personalized'
+
+export interface CsvRow {
+  first_name: string
+  last_name: string
+  email: string
+  subject: string
+  body: string
+}
 
 export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled'
 
@@ -206,6 +214,8 @@ export interface CampaignRecipient {
   bounced_at: string | null
   unsubscribed_at: string | null
   tracking_id: string
+  personalized_subject: string | null
+  personalized_body: string | null
   created_at: string
 }
 
