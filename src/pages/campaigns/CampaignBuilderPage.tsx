@@ -128,6 +128,14 @@ export function CampaignBuilderPage() {
     }
   }, [fromTemplateId, populated, editor])
 
+  // Pre-fill sender defaults for new campaigns (no id, no template)
+  useEffect(() => {
+    if (!id && !fromTemplateId && !populated && profile) {
+      if (profile.default_sender_name) setFromName(profile.default_sender_name)
+      if (profile.default_sender_email) setFromEmail(profile.default_sender_email)
+    }
+  }, [id, fromTemplateId, populated, profile])
+
   // beforeunload guard (D-23)
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
