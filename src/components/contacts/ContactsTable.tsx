@@ -13,6 +13,9 @@ interface ContactsTableProps {
   hasFilters?: boolean
   onPageChange: (page: number) => void
   onContactClick: (contact: Contact) => void
+  selectedIds?: Set<string>
+  onToggleSelect?: (id: string) => void
+  onToggleAll?: () => void
 }
 
 type StatusVariant = 'success' | 'warning' | 'danger' | 'default'
@@ -57,8 +60,12 @@ export function ContactsTable({
   hasFilters = false,
   onPageChange,
   onContactClick,
+  selectedIds,
+  onToggleSelect,
+  onToggleAll,
 }: ContactsTableProps) {
   const totalPages = Math.ceil(totalCount / pageSize)
+  const allSelected = contacts.length > 0 && contacts.every(c => selectedIds?.has(c.id))
 
   if (loading) {
     return (
@@ -99,6 +106,12 @@ export function ContactsTable({
       <table className="w-full">
         <thead>
           <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-900 border-b border-gray-800">
+            {onToggleSelect && (
+              <th className="px-4 py-3 w-10">
+                <input type="checkbox" className="w-4 h-4 accent-indigo-500 cursor-pointer"
+                  checked={!!allSelected} onChange={() => onToggleAll?.()} />
+              </th>
+            )}
             <th className="text-left px-4 py-3">Name</th>
             <th className="text-left px-4 py-3">Email</th>
             <th className="text-left px-4 py-3">Status</th>
@@ -122,6 +135,13 @@ export function ContactsTable({
                 className="h-12 border-b border-gray-800/50 hover:bg-gray-800/50 cursor-pointer transition-colors"
                 onClick={() => onContactClick(contact)}
               >
+                {onToggleSelect && (
+                  <td className="px-4 py-3 w-10" onClick={(e) => e.stopPropagation()}>
+                    <input type="checkbox" className="w-4 h-4 accent-indigo-500 cursor-pointer"
+                      checked={selectedIds?.has(contact.id) ?? false}
+                      onChange={() => onToggleSelect(contact.id)} />
+                  </td>
+                )}
                 <td className="px-4 py-3">
                   <span className="text-sm text-gray-100 font-medium">
                     {fullName || '--'}

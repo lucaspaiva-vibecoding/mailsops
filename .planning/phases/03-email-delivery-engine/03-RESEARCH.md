@@ -890,22 +890,22 @@ return new Response(pixel, {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Resend API key storage — project vs per-workspace**
    - What we know: `RESEND_API_KEY` is an Edge Function secret set in Supabase Dashboard; Phase 7 (SETT-02) will allow users to configure their own key
    - What's unclear: For Phase 3, is the key hardcoded as a project-level secret, or should we check the DB for a workspace-configured key?
-   - Recommendation: Use hardcoded Edge Function secret for Phase 3. Phase 7 will add DB-stored key lookup.
+   - RESOLVED: Recommendation: Use hardcoded Edge Function secret for Phase 3. Phase 7 will add DB-stored key lookup.
 
 2. **Open event deduplication for aggregate counter updates**
    - What we know: `tracking_events` will have multiple open rows per recipient (multiple email opens). `campaigns.total_opened` should be unique openers, not total events.
    - What's unclear: Should `total_opened` be unique contacts or total open events?
-   - Recommendation: Count unique contacts (first open per tracking_id) for `total_opened`. Use a Postgres trigger or `INSERT ON CONFLICT DO NOTHING` with a unique constraint on (tracking_id, event_type='open') for the first occurrence.
+   - RESOLVED: Recommendation: Count unique contacts (first open per tracking_id) for `total_opened`. Use a Postgres trigger or `INSERT ON CONFLICT DO NOTHING` with a unique constraint on (tracking_id, event_type='open') for the first occurrence.
 
 3. **Edge Function timeout for large lists**
    - What we know: Supabase Edge Functions have a 150-second timeout wall clock limit (approximate)
    - What's unclear: For lists of 100 contacts (max free tier anyway), the send will complete well within timeout. Confirmed safe for MVP.
-   - Recommendation: No async queue needed for Phase 3. Document the limit as a known constraint.
+   - RESOLVED: Recommendation: No async queue needed for Phase 3. Document the limit as a known constraint.
 
 ---
 

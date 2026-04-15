@@ -8,8 +8,15 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
 
-// Maps Resend event type to campaign_recipients.delivery_status value
+// Maps Resend event type to campaign_recipients.status value
 const statusMap: Record<string, string> = {
+  'email.delivered': 'delivered',
+  'email.bounced': 'bounced',
+  'email.complained': 'complained',
+}
+
+// Maps Resend event type to campaign_events.event_type value
+const eventTypeMap: Record<string, string> = {
   'email.delivered': 'delivered',
   'email.bounced': 'bounced',
   'email.complained': 'complained',
@@ -63,7 +70,7 @@ Deno.serve(async (req) => {
       return new Response('Invalid signature', { status: 400 })
     }
 
-    // Map event type to delivery status
+    // Map event type to recipient status
     const newStatus = statusMap[event.type]
     if (!newStatus) {
       // Unhandled event type (e.g. email.opened, email.clicked) — acknowledge to
@@ -71,12 +78,16 @@ Deno.serve(async (req) => {
       return new Response('ok', { status: 200 })
     }
 
-    // Locate the recipient row using the Resend email ID stored at send time
-    const { data: recipient } = await supabase
+    // Locate the recipient row using the Resend message ID stored at send time
+    const { data: recipient, error: recipientError } = await supabase
       .from('campaign_recipients')
-      .select('id, campaign_id, contact_id, delivery_status')
-      .eq('resend_email_id', event.data.email_id)
+      .select('id, campaign_id, contact_id, workspace_id, status')
+      .eq('resend_message_id', event.data.email_id)
       .single()
+
+    if (recipientError) {
+      console.error('[resend-webhook] recipient lookup error:', recipientError.message)
+    }
 
     if (!recipient) {
       // No matching recipient — may be from a test send (send-test-email does not
@@ -86,7 +97,7 @@ Deno.serve(async (req) => {
 
     // Build the update payload for campaign_recipients
     const updatePayload: Record<string, string> = {
-      delivery_status: newStatus,
+      status: newStatus,
     }
 
     if (event.type === 'email.delivered') {
@@ -95,14 +106,42 @@ Deno.serve(async (req) => {
       updatePayload.bounced_at = event.created_at
     }
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('campaign_recipients')
       .update(updatePayload)
       .eq('id', recipient.id)
 
+    if (updateError) {
+      console.error('[resend-webhook] campaign_recipients update error:', updateError.message)
+    }
+
+    // Insert event into campaign_events for audit trail
+    const eventType = eventTypeMap[event.type]
+    if (eventType) {
+      const eventRow: Record<string, unknown> = {
+        campaign_id: recipient.campaign_id,
+        recipient_id: recipient.id,
+        workspace_id: recipient.workspace_id,
+        event_type: eventType,
+      }
+
+      if (event.type === 'email.bounced' && event.data.bounce) {
+        eventRow.bounce_type = event.data.bounce.type === 'Permanent' ? 'hard' : 'soft'
+        eventRow.bounce_reason = event.data.bounce.message ?? null
+      }
+
+      const { error: eventInsertError } = await supabase
+        .from('campaign_events')
+        .insert(eventRow)
+
+      if (eventInsertError) {
+        console.error('[resend-webhook] campaign_events insert error:', eventInsertError.message)
+      }
+    }
+
     // Update contact status for events that affect future deliverability
     if (event.type === 'email.bounced') {
-      await supabase
+      const { error: contactUpdateError } = await supabase
         .from('contacts')
         .update({
           status: 'bounced',
@@ -110,35 +149,50 @@ Deno.serve(async (req) => {
           bounced_at: event.created_at,
         })
         .eq('id', recipient.contact_id)
+
+      if (contactUpdateError) {
+        console.error('[resend-webhook] contacts bounce update error:', contactUpdateError.message)
+      }
     }
 
     if (event.type === 'email.complained') {
-      await supabase
+      const { error: contactUpdateError } = await supabase
         .from('contacts')
         .update({ status: 'complained' })
         .eq('id', recipient.contact_id)
+
+      if (contactUpdateError) {
+        console.error('[resend-webhook] contacts complained update error:', contactUpdateError.message)
+      }
     }
 
     // Increment the campaign's aggregate delivery counter
     const counterField = counterMap[event.type]
     if (counterField) {
-      const { data: campaign } = await supabase
+      const { data: campaign, error: campaignFetchError } = await supabase
         .from('campaigns')
         .select(`id, ${counterField}`)
         .eq('id', recipient.campaign_id)
         .single()
 
-      if (campaign) {
-        await supabase
+      if (campaignFetchError) {
+        console.error('[resend-webhook] campaign fetch error:', campaignFetchError.message)
+      } else if (campaign) {
+        const { error: campaignUpdateError } = await supabase
           .from('campaigns')
           .update({ [counterField]: (campaign as Record<string, number>)[counterField] + 1 })
           .eq('id', recipient.campaign_id)
+
+        if (campaignUpdateError) {
+          console.error('[resend-webhook] campaign counter update error:', campaignUpdateError.message)
+        }
       }
     }
 
     return new Response('ok', { status: 200 })
   } catch (err) {
     // Return 500 so Resend will retry the delivery
+    console.error('[resend-webhook] unhandled error:', (err as Error).message)
     return new Response((err as Error).message, { status: 500 })
   }
 })

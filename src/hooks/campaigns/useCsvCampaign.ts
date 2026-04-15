@@ -11,32 +11,64 @@ export function useCsvCampaign() {
   }): Promise<{ data: { campaignId: string; recipientCount: number } | null; error: string | null }> => {
     if (!profile?.workspace_id) return { data: null, error: 'Not authenticated' }
 
-    // Step 1: Upsert contacts by (workspace_id, email)
-    const contactPayload = payload.rows.map(row => ({
-      workspace_id: profile.workspace_id,
-      email: row.email.toLowerCase().trim(),
-      first_name: row.first_name || null,
-      last_name: row.last_name || null,
-      company: null,
-      tags: [],
-      custom_fields: {},
-      status: 'active' as const,
-    }))
+    // Step 1: Application-level upsert contacts by (workspace_id, email)
+    // (No unique constraint on contacts(workspace_id, email) — use select+insert/update pattern)
+    const emails = payload.rows.map(r => r.email.toLowerCase().trim())
 
-    const { data: upsertedContacts, error: upsertError } = await supabase
+    const { data: existingContacts, error: fetchError } = await supabase
       .from('contacts')
-      .upsert(contactPayload, { onConflict: 'workspace_id,email', ignoreDuplicates: false })
       .select('id, email')
+      .eq('workspace_id', profile.workspace_id)
+      .in('email', emails)
+      .is('deleted_at', null)
 
-    if (upsertError) return { data: null, error: `Contact upsert failed: ${upsertError.message}` }
-    if (!upsertedContacts || upsertedContacts.length === 0) {
-      return { data: null, error: 'No contacts were created or updated' }
+    if (fetchError) return { data: null, error: `Contact lookup failed: ${fetchError.message}` }
+
+    const existingByEmail = new Map<string, string>()
+    for (const c of existingContacts ?? []) {
+      existingByEmail.set(c.email, c.id)
     }
 
-    // Build email-to-id map for recipient linking
     const emailToContactId = new Map<string, string>()
-    for (const c of upsertedContacts) {
-      emailToContactId.set(c.email, c.id)
+
+    // Update existing contacts (first_name / last_name)
+    const toUpdate = payload.rows.filter(r => existingByEmail.has(r.email.toLowerCase().trim()))
+    for (const row of toUpdate) {
+      const email = row.email.toLowerCase().trim()
+      const id = existingByEmail.get(email)!
+      await supabase.from('contacts').update({
+        first_name: row.first_name || null,
+        last_name: row.last_name || null,
+        updated_at: new Date().toISOString(),
+      }).eq('id', id)
+      emailToContactId.set(email, id)
+    }
+
+    // Insert new contacts
+    const toInsert = payload.rows.filter(r => !existingByEmail.has(r.email.toLowerCase().trim()))
+    if (toInsert.length > 0) {
+      const insertPayload = toInsert.map(row => ({
+        workspace_id: profile.workspace_id,
+        email: row.email.toLowerCase().trim(),
+        first_name: row.first_name || null,
+        last_name: row.last_name || null,
+        company: null,
+        tags: [],
+        custom_fields: {},
+        status: 'active' as const,
+      }))
+      const { data: inserted, error: insertError } = await supabase
+        .from('contacts')
+        .insert(insertPayload)
+        .select('id, email')
+      if (insertError) return { data: null, error: `Contact insert failed: ${insertError.message}` }
+      for (const c of inserted ?? []) {
+        emailToContactId.set(c.email, c.id)
+      }
+    }
+
+    if (emailToContactId.size === 0) {
+      return { data: null, error: 'No contacts were created or updated' }
     }
 
     // Step 2: Create campaign with campaign_type='csv_personalized'
