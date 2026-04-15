@@ -179,10 +179,31 @@ Plans:
 
 **UI hint**: yes
 
+### Phase 9: CSV-Personalized Campaigns
+**Goal**: Users can upload a CSV of pre-composed emails (one row = one recipient with full HTML body) and send them as a personalized campaign — bypassing the TipTap editor and contact list flow
+**Depends on**: Phase 3, Phase 7, Phase 8
+**Requirements**: CSV-01, CSV-02, CSV-03, CSV-04, CSV-05
+**Success Criteria** (what must be TRUE):
+  1. User can upload a CSV with columns first_name, last_name, email, subject, body (HTML) and see a preview of the first 5 rows before sending
+  2. CSV rows are upserted into the contacts table and a campaign_recipients row is created per row with personalized_subject and personalized_body populated
+  3. send-campaign Edge Function detects personalized_body IS NOT NULL and uses it instead of campaigns.body_html; tracking pipeline (pixel, link wrapping, unsub footer) is unchanged
+  4. Sender name and email come from workspace defaults (profiles.default_sender_name / default_sender_email)
+  5. Post-create review page shows the recipient list with send-now or schedule controls
+**Plans**: 5 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — DB migration 011 (campaign_type constraint + personalized columns on campaign_recipients), TypeScript types, useCsvCampaign hook, CSV parser utility
+- [ ] 09-02-PLAN.md — CSV upload page: dropzone → parse → column validation → 5-row preview → create campaign + recipients
+- [ ] 09-03-PLAN.md — Review/send page + CampaignsPage dropdown (Standard / A-B test / CSV personalized) + CSV badge
+- [ ] 09-04-PLAN.md — send-campaign Edge Function personalized_body branch (override subject + body when present, tracking unchanged)
+- [ ] 09-05-PLAN.md — [BLOCKING] Schema push + build/lint + smoke test
+
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -194,3 +215,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
 | 7. Templates & Settings | 4/5 | In Progress|  |
 | 8. Email Signature & Rich HTML Body | 4/4 | Complete   | 2026-04-14 |
+| 9. CSV-Personalized Campaigns | 0/5 | Not started | - |
