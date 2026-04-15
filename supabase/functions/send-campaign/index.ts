@@ -163,12 +163,171 @@ Deno.serve(async (req) => {
     }
 
     // 8. Validate campaign has a contact list
-    if (!campaign.contact_list_id) {
+    if (!campaign.contact_list_id && campaign.campaign_type !== 'csv_personalized') {
       return new Response(JSON.stringify({ error: 'Campaign has no target contact list' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+
+    // --- csv_personalized: separate execution path ---
+    if (campaign.campaign_type === 'csv_personalized') {
+      // Load pre-built recipients with contact details
+      const { data: csvRecipients, error: csvRecipientsError } = await adminClient
+        .from('campaign_recipients')
+        .select('*, contacts(id, email, first_name, last_name, company, status)')
+        .eq('campaign_id', campaign_id)
+        .eq('status', 'queued')
+
+      if (csvRecipientsError) {
+        return new Response(JSON.stringify({ error: 'Failed to load recipients' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Filter to active contacts only
+      const activeRecipients = (csvRecipients ?? []).filter(
+        (r: any) => r.contacts && r.contacts.status === 'active'
+      )
+
+      if (activeRecipients.length === 0) {
+        return new Response(JSON.stringify({ error: 'No active recipients for this campaign' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Update campaign status to 'sending'
+      await adminClient.from('campaigns').update({
+        status: 'sending',
+        sent_at: new Date().toISOString(),
+        total_recipients: activeRecipients.length,
+      }).eq('id', campaign_id)
+
+      // Skip campaign_links building — csv_personalized has per-recipient unique links
+      // Link map stored in campaign_recipients.variables for the t function fallback
+
+      // Process in batches
+      let totalSent = 0
+
+      for (let i = 0; i < activeRecipients.length; i += BATCH_SIZE) {
+        const batch = activeRecipients.slice(i, i + BATCH_SIZE)
+
+        // Prepare emails — use personalized_body/subject directly, NO signature injection
+        const preparedEmails = batch.map((recipient: any) => {
+          const contact = recipient.contacts
+          const trackingId = recipient.tracking_id  // Use existing tracking_id from recipient row
+
+          // csv_personalized: body is already final, no variable substitution, no signature
+          const rawBody = recipient.personalized_body ?? ''
+          const finalSubject = recipient.personalized_subject ?? ''
+
+          // Tracking pipeline still applies: wrap links, unsub footer, pixel
+          const { html: wrappedHtml, linkMap } = wrapLinks(rawBody, trackingId, TRACKING_BASE)
+          const htmlWithUnsub = addUnsubscribeFooter(wrappedHtml, trackingId, TRACKING_BASE)
+          const finalHtml = injectPixel(htmlWithUnsub, trackingId, TRACKING_BASE)
+
+          return {
+            recipientId: recipient.id,
+            contact,
+            trackingId,
+            html: finalHtml,
+            subject: finalSubject,
+            linkMap,
+          }
+        })
+
+        // Update recipients with link maps (variables JSONB) — t function uses this for click redirect
+        for (const email of preparedEmails) {
+          const { error: updateError } = await adminClient
+            .from('campaign_recipients')
+            .update({ variables: email.linkMap })
+            .eq('id', email.recipientId)
+          if (updateError) {
+            console.error('[send-campaign] csv recipient variables update error:', updateError.message)
+          }
+        }
+
+        // Build Resend batch payload
+        const resendBatch = preparedEmails.map((email: any) => ({
+          from: `${campaign.from_name} <${campaign.from_email}>`,
+          to: [email.contact.email],
+          subject: email.subject,
+          html: email.html,
+          reply_to: campaign.reply_to_email || undefined,
+        }))
+
+        // Send via Resend batch API
+        const resendResponse = await fetch('https://api.resend.com/emails/batch', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(resendBatch),
+        })
+
+        // Handle rate limit
+        if (resendResponse.status === 429) {
+          await adminClient.from('campaigns').update({
+            status: 'paused',
+            total_sent: totalSent,
+          }).eq('id', campaign_id)
+
+          return new Response(JSON.stringify({
+            ok: false,
+            error: 'Rate limit reached. Campaign paused.',
+            sent: totalSent,
+            total: activeRecipients.length,
+          }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+
+        if (!resendResponse.ok) {
+          console.error(`[send-campaign] Resend batch error: ${resendResponse.status} ${await resendResponse.text()}`)
+          continue
+        }
+
+        // Update recipients with resend_message_id
+        const { data: resendData } = await resendResponse.json()
+        if (resendData) {
+          for (let j = 0; j < resendData.length; j++) {
+            const { error: updateError } = await adminClient
+              .from('campaign_recipients')
+              .update({
+                resend_message_id: resendData[j].id,
+                status: 'sent',
+                sent_at: new Date().toISOString(),
+              })
+              .eq('id', preparedEmails[j].recipientId)
+            if (updateError) {
+              console.error('[send-campaign] csv recipient post-send update error:', updateError.message)
+            }
+          }
+        }
+
+        totalSent += batch.length
+
+        // Rate limiting between batches
+        if (i + BATCH_SIZE < activeRecipients.length) {
+          await new Promise((resolve) => setTimeout(resolve, 300))
+        }
+      }
+
+      // Mark campaign as sent
+      await adminClient.from('campaigns').update({
+        status: 'sent',
+        total_sent: totalSent,
+      }).eq('id', campaign_id)
+
+      return new Response(JSON.stringify({ ok: true, sent: totalSent, total: activeRecipients.length }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    // --- End csv_personalized branch ---
 
     // 9. Load contacts — either from contact_ids override (A/B testing) or full list
     let activeContacts: any[]

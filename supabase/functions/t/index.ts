@@ -18,14 +18,35 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 /**
  * Look up a campaign_recipient row by tracking_id.
- * Returns contact_id, campaign_id, and link_map.
+ * Returns the row ID (for campaign_events FK), contact_id, campaign_id,
+ * workspace_id, and opened_at/clicked_at for first-event checks.
  */
 async function getRecipient(trackingId: string) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('campaign_recipients')
-    .select('contact_id, campaign_id, link_map')
+    .select('id, contact_id, campaign_id, workspace_id, opened_at, clicked_at')
     .eq('tracking_id', trackingId)
     .single()
+  if (error) {
+    console.error('[getRecipient] lookup error:', error.message)
+  }
+  return data
+}
+
+/**
+ * Look up the original URL for a click redirect from campaign_links.
+ * Returns the campaign_links row (id, original_url, click_count, unique_clicks).
+ */
+async function getCampaignLink(campaignId: string, linkIndex: number) {
+  const { data, error } = await supabase
+    .from('campaign_links')
+    .select('id, original_url, click_count, unique_clicks')
+    .eq('campaign_id', campaignId)
+    .eq('link_index', linkIndex)
+    .single()
+  if (error) {
+    console.error('[getCampaignLink] lookup error:', error.message)
+  }
   return data
 }
 
@@ -34,16 +55,23 @@ async function getRecipient(trackingId: string) {
  * Fetches current value then updates — avoids needing a custom RPC function.
  */
 async function incrementCampaignCounter(campaignId: string, field: string) {
-  const { data: campaign } = await supabase
+  const { data: campaign, error } = await supabase
     .from('campaigns')
     .select(field)
     .eq('id', campaignId)
     .single()
+  if (error) {
+    console.error(`[incrementCampaignCounter] fetch error for field ${field}:`, error.message)
+    return
+  }
   if (campaign) {
-    await supabase
+    const { error: updateError } = await supabase
       .from('campaigns')
       .update({ [field]: (campaign as Record<string, number>)[field] + 1 })
       .eq('id', campaignId)
+    if (updateError) {
+      console.error(`[incrementCampaignCounter] update error for field ${field}:`, updateError.message)
+    }
   }
 }
 
@@ -61,30 +89,40 @@ app.get('/pixel/:trackingId', async (c) => {
 
   if (isValidUUID) {
     try {
-      // Insert open event — fire before returning pixel
-      await supabase.from('tracking_events').insert({
-        tracking_id: trackingId,
-        event_type: 'open',
-        occurred_at: new Date().toISOString(),
-        user_agent: c.req.header('User-Agent') ?? null,
-      })
+      const recipient = await getRecipient(trackingId)
 
-      // Check if this is the first open for this tracking_id (count === 1)
-      const { count } = await supabase
-        .from('tracking_events')
-        .select('*', { count: 'exact', head: true })
-        .eq('tracking_id', trackingId)
-        .eq('event_type', 'open')
+      if (recipient) {
+        const now = new Date().toISOString()
 
-      if (count === 1) {
-        // First open — increment the campaign's total_opened counter
-        const recipient = await getRecipient(trackingId)
-        if (recipient?.campaign_id) {
+        // Insert open event into campaign_events
+        const { error: insertError } = await supabase.from('campaign_events').insert({
+          campaign_id: recipient.campaign_id,
+          recipient_id: recipient.id,
+          workspace_id: recipient.workspace_id,
+          event_type: 'opened',
+          user_agent: c.req.header('User-Agent') ?? null,
+        })
+        if (insertError) {
+          console.error('[pixel] insert campaign_events error:', insertError.message)
+        }
+
+        // Update recipient.opened_at only on the first open
+        if (!recipient.opened_at) {
+          const { error: recipientUpdateError } = await supabase
+            .from('campaign_recipients')
+            .update({ opened_at: now, status: 'opened' })
+            .eq('id', recipient.id)
+          if (recipientUpdateError) {
+            console.error('[pixel] update campaign_recipients error:', recipientUpdateError.message)
+          }
+
+          // First open — increment the campaign's total_opened counter
           await incrementCampaignCounter(recipient.campaign_id, 'total_opened')
         }
       }
-    } catch {
+    } catch (err) {
       // DB errors must not break email rendering — return pixel regardless
+      console.error('[pixel] unexpected error:', (err as Error).message)
     }
   }
 
@@ -98,41 +136,109 @@ app.get('/pixel/:trackingId', async (c) => {
 })
 
 // ── Route 2: Click Redirect (D-03, DELV-05) ──────────────────────────────────
-// Logs the click event then 302-redirects to the original URL from the DB.
-// Security: redirect URL always comes from link_map in the DB — never from
+// Logs the click event then 302-redirects to the original URL from campaign_links.
+// Security: redirect URL always comes from campaign_links in the DB — never from
 // query params or request body (prevents open redirect, T-03-08).
 
 app.get('/click/:trackingId/:linkIndex', async (c) => {
   const trackingId = c.req.param('trackingId')
-  const linkIndex = c.req.param('linkIndex')
+  const linkIndexStr = c.req.param('linkIndex')
+  const linkIndex = parseInt(linkIndexStr, 10)
 
-  if (!UUID_REGEX.test(trackingId)) {
+  if (!UUID_REGEX.test(trackingId) || isNaN(linkIndex)) {
     return new Response('Invalid tracking link', { status: 400 })
   }
 
   const recipient = await getRecipient(trackingId)
-  const originalUrl = recipient?.link_map?.[linkIndex]
 
-  if (!recipient || !originalUrl) {
+  if (!recipient) {
     return new Response('Invalid tracking link', { status: 400 })
   }
 
-  // Log click event (best-effort — don't block the redirect)
+  // Look up the original URL from campaign_links (never from request params)
+  const campaignLink = await getCampaignLink(recipient.campaign_id, linkIndex)
+
+  let originalUrl: string
+
+  if (campaignLink) {
+    originalUrl = campaignLink.original_url
+  } else {
+    // Fallback: check campaign_recipients.variables JSONB (used by csv_personalized)
+    const { data: recipientRow, error: recipientError } = await supabase
+      .from('campaign_recipients')
+      .select('variables')
+      .eq('id', recipient.id)
+      .single()
+
+    if (recipientError || !recipientRow) {
+      console.error(`[click] No campaign_links or recipient variables for campaign=${recipient.campaign_id} link_index=${linkIndex}`)
+      return new Response('Invalid tracking link', { status: 400 })
+    }
+
+    const variables = recipientRow.variables as Record<string, string> | null
+    const fallbackUrl = variables?.[String(linkIndex)]
+
+    if (!fallbackUrl) {
+      console.error(`[click] No URL found in variables for link_index=${linkIndex}, recipient=${recipient.id}`)
+      return new Response('Invalid tracking link', { status: 400 })
+    }
+
+    originalUrl = fallbackUrl
+  }
+
+  // Log click event and update counters (best-effort — don't block the redirect)
   try {
-    await supabase.from('tracking_events').insert({
-      tracking_id: trackingId,
-      event_type: 'click',
-      link_index: parseInt(linkIndex, 10),
+    const now = new Date().toISOString()
+
+    // Insert clicked event into campaign_events
+    const { error: insertError } = await supabase.from('campaign_events').insert({
+      campaign_id: recipient.campaign_id,
+      recipient_id: recipient.id,
+      workspace_id: recipient.workspace_id,
+      event_type: 'clicked',
+      link_index: linkIndex,
       link_url: originalUrl,
-      occurred_at: new Date().toISOString(),
       user_agent: c.req.header('User-Agent') ?? null,
     })
+    if (insertError) {
+      console.error('[click] insert campaign_events error:', insertError.message)
+    }
 
-    if (recipient.campaign_id) {
+    // Determine if this is the first click from this recipient (for unique_clicks)
+    const isFirstClick = !recipient.clicked_at
+
+    // Update recipient.clicked_at on first click
+    if (isFirstClick) {
+      const { error: recipientUpdateError } = await supabase
+        .from('campaign_recipients')
+        .update({ clicked_at: now, status: 'clicked' })
+        .eq('id', recipient.id)
+      if (recipientUpdateError) {
+        console.error('[click] update campaign_recipients error:', recipientUpdateError.message)
+      }
+
+      // Increment campaign total_clicked counter on first click
       await incrementCampaignCounter(recipient.campaign_id, 'total_clicked')
     }
-  } catch {
+
+    // Increment campaign_links counters (only when campaign_links row exists)
+    if (campaignLink) {
+      const updatedClickCount = campaignLink.click_count + 1
+      const updatedUniqueClicks = isFirstClick
+        ? campaignLink.unique_clicks + 1
+        : campaignLink.unique_clicks
+
+      const { error: linkUpdateError } = await supabase
+        .from('campaign_links')
+        .update({ click_count: updatedClickCount, unique_clicks: updatedUniqueClicks })
+        .eq('id', campaignLink.id)
+      if (linkUpdateError) {
+        console.error('[click] update campaign_links error:', linkUpdateError.message)
+      }
+    }
+  } catch (err) {
     // DB errors must not block the redirect — recipient still gets to the URL
+    console.error('[click] unexpected error:', (err as Error).message)
   }
 
   return Response.redirect(originalUrl, 302)
@@ -161,27 +267,42 @@ app.get('/unsub/:trackingId', async (c) => {
   }
 
   // Update contact status to unsubscribed
-  await supabase
+  const { error: contactUpdateError } = await supabase
     .from('contacts')
     .update({ status: 'unsubscribed', unsubscribed_at: new Date().toISOString() })
     .eq('id', recipient.contact_id)
+  if (contactUpdateError) {
+    console.error('[unsub] update contacts error:', contactUpdateError.message)
+  }
 
-  // Log the unsubscribe event
+  // Update recipient status and timestamp
+  const { error: recipientUpdateError } = await supabase
+    .from('campaign_recipients')
+    .update({ status: 'unsubscribed', unsubscribed_at: new Date().toISOString() })
+    .eq('id', recipient.id)
+  if (recipientUpdateError) {
+    console.error('[unsub] update campaign_recipients error:', recipientUpdateError.message)
+  }
+
+  // Log the unsubscribe event into campaign_events
   try {
-    await supabase.from('tracking_events').insert({
-      tracking_id: trackingId,
-      event_type: 'unsubscribe',
-      occurred_at: new Date().toISOString(),
+    const { error: insertError } = await supabase.from('campaign_events').insert({
+      campaign_id: recipient.campaign_id,
+      recipient_id: recipient.id,
+      workspace_id: recipient.workspace_id,
+      event_type: 'unsubscribed',
       user_agent: c.req.header('User-Agent') ?? null,
     })
-  } catch {
+    if (insertError) {
+      console.error('[unsub] insert campaign_events error:', insertError.message)
+    }
+  } catch (err) {
     // Event logging failure must not block the unsubscribe confirmation
+    console.error('[unsub] unexpected error:', (err as Error).message)
   }
 
   // Increment campaign's total_unsubscribed counter
-  if (recipient.campaign_id) {
-    await incrementCampaignCounter(recipient.campaign_id, 'total_unsubscribed')
-  }
+  await incrementCampaignCounter(recipient.campaign_id, 'total_unsubscribed')
 
   return new Response(
     `<!DOCTYPE html>
