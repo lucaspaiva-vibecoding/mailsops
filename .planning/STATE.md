@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 09-csv-personalized-campaigns-03-PLAN.md
-last_updated: "2026-04-15T12:48:38.929Z"
+stopped_at: Completed 09-csv-personalized-campaigns-04-PLAN.md
+last_updated: "2026-04-15T12:52:11.151Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 9
   completed_phases: 8
   total_plans: 39
-  completed_plans: 37
-  percent: 95
+  completed_plans: 38
+  percent: 97
 ---
 
 # Project State
@@ -81,6 +81,7 @@ Progress: [██████████] 100%
 | Phase 09-csv-personalized-campaigns P01 | 10 | 2 tasks | 4 files |
 | Phase 09-csv-personalized-campaigns P02 | 8 | 2 tasks | 2 files |
 | Phase 09-csv-personalized-campaigns P03 | 5min | 2 tasks | 3 files |
+| Phase 09-csv-personalized-campaigns P04 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,9 @@ Recent decisions affecting current work:
 - [Phase 09-csv-personalized-campaigns]: Route /campaigns/new/csv placed between /campaigns/ab-test/new and /campaigns/new to prevent :id wildcard matching
 - [Phase 09-csv-personalized-campaigns]: Removed FlaskConical import when collapsing A/B Test into unified dropdown — unused imports cause lint noise
 - [Phase 09-csv-personalized-campaigns]: CampaignRecipientWithContact type already existed in database.ts — used directly without inline redefinition
+- [Phase 09-csv-personalized-campaigns]: csv_personalized branch implemented as early-return block after contact_list_id guard — standard pipeline untouched
+- [Phase 09-csv-personalized-campaigns]: t function fallback reads campaign_recipients.variables JSONB keyed by link_index string — matches linkMap format from wrapLinks()
+- [Phase 09-csv-personalized-campaigns]: campaign_links counter update wrapped in conditional — csv_personalized clicks still tracked in campaign_events and recipient timestamps
 
 ### Roadmap Evolution
 
@@ -169,6 +173,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T12:48:38.926Z
-Stopped at: Completed 09-csv-personalized-campaigns-03-PLAN.md
+Last session: 2026-04-15T12:52:11.149Z
+Stopped at: Completed 09-csv-personalized-campaigns-04-PLAN.md
 Resume file: None
