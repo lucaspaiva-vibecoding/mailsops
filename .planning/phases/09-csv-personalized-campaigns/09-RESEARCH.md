@@ -557,7 +557,7 @@ import { CsvReviewPage } from './pages/campaigns/CsvReviewPage'
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **t Edge Function click redirect mechanism**
    - What we know: `campaign_recipient.variables` stores the link map; `campaign_links` stores per-campaign link stats
