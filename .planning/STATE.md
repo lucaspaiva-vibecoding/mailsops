@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 09-csv-personalized-campaigns-01-PLAN.md
-last_updated: "2026-04-15T12:41:44.074Z"
+stopped_at: Completed 09-csv-personalized-campaigns-02-PLAN.md
+last_updated: "2026-04-15T12:44:21.052Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 9
   completed_phases: 8
   total_plans: 39
-  completed_plans: 35
-  percent: 90
+  completed_plans: 36
+  percent: 92
 ---
 
 # Project State
@@ -79,6 +79,7 @@ Progress: [██████████] 100%
 | Phase 08 P02 | 4min | 2 tasks | 3 files |
 | Phase 08-email-signature-rich-html-body P04 | 11min | 3 tasks | 8 files |
 | Phase 09-csv-personalized-campaigns P01 | 10 | 2 tasks | 4 files |
+| Phase 09-csv-personalized-campaigns P02 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,7 @@ Recent decisions affecting current work:
 - [Phase 08]: supabase/functions/** excluded from ESLint — Deno runtime files should not be linted by browser ESLint config
 - [Phase 08]: Typed MemberRow/SendRow via unknown cast satisfies both ESLint no-explicit-any and TypeScript strict overloads for Supabase joined results
 - [Phase 09-csv-personalized-campaigns]: useCsvCampaign performs cleanup delete on campaign if recipients bulk insert fails
+- [Phase 09-csv-personalized-campaigns]: Route /campaigns/new/csv placed between /campaigns/ab-test/new and /campaigns/new to prevent :id wildcard matching
 
 ### Roadmap Evolution
 
@@ -164,6 +166,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T12:41:44.071Z
-Stopped at: Completed 09-csv-personalized-campaigns-01-PLAN.md
+Last session: 2026-04-15T12:44:21.050Z
+Stopped at: Completed 09-csv-personalized-campaigns-02-PLAN.md
 Resume file: None

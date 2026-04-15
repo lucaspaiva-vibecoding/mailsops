@@ -193,7 +193,7 @@ Plans:
 
 Plans:
 - [x] 09-01-PLAN.md — DB migration 011 (campaign_type constraint + personalized columns on campaign_recipients), TypeScript types, useCsvCampaign hook, CSV parser utility
-- [ ] 09-02-PLAN.md — CSV upload page: dropzone → parse → column validation → 5-row preview → create campaign + recipients
+- [x] 09-02-PLAN.md — CSV upload page: dropzone → parse → column validation → 5-row preview → create campaign + recipients
 - [ ] 09-03-PLAN.md — Review/send page + CampaignsPage dropdown (Standard / A-B test / CSV personalized) + CSV badge
 - [ ] 09-04-PLAN.md — send-campaign Edge Function personalized_body branch (override subject + body when present, tracking unchanged)
 - [ ] 09-05-PLAN.md — [BLOCKING] Schema push + build/lint + smoke test
@@ -215,4 +215,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Sequences | 5/5 | Complete   | 2026-04-14 |
 | 7. Templates & Settings | 4/5 | In Progress|  |
 | 8. Email Signature & Rich HTML Body | 4/4 | Complete   | 2026-04-14 |
-| 9. CSV-Personalized Campaigns | 1/5 | In Progress|  |
+| 9. CSV-Personalized Campaigns | 2/5 | In Progress|  |
