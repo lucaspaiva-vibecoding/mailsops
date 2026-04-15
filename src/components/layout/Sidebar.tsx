@@ -4,7 +4,6 @@ import {
   Users,
   Mail,
   FileText,
-  BarChart3,
   Settings,
   X,
   ChevronLeft,
@@ -24,7 +23,6 @@ const navItems = [
   { to: '/campaigns', icon: Mail, label: 'Campaigns' },
   { to: '/sequences', icon: Workflow, label: 'Sequences' },
   { to: '/templates', icon: FileText, label: 'Templates' },
-  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 
