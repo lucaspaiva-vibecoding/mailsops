@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, MoreHorizontal, Mail, Upload, FlaskConical } from 'lucide-react'
+import { Plus, MoreHorizontal, Mail, Upload, ChevronDown } from 'lucide-react'
 import { useCampaigns } from '../../hooks/campaigns/useCampaigns'
 import { useContactLists } from '../../hooks/contacts/useContactLists'
 import { useToast } from '../../components/ui/Toast'
@@ -42,7 +42,9 @@ export function CampaignsPage() {
   const [showImportModal, setShowImportModal] = useState(false)
   const [saveAsTemplateTarget, setSaveAsTemplateTarget] = useState<Campaign | null>(null)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [newCampaignMenuOpen, setNewCampaignMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
+  const newCampaignMenuRef = useRef<HTMLDivElement | null>(null)
 
   const allSelected = campaigns.length > 0 && campaigns.every(c => selectedIds.has(c.id))
   const toggleSelect = (id: string) => setSelectedIds(prev => {
@@ -83,9 +85,24 @@ export function CampaignsPage() {
     }
   }, [openMenuId])
 
+  // Close new campaign dropdown on click outside
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (newCampaignMenuRef.current && !newCampaignMenuRef.current.contains(e.target as Node)) {
+        setNewCampaignMenuOpen(false)
+      }
+    }
+    if (newCampaignMenuOpen) {
+      document.addEventListener('mousedown', handleMouseDown)
+    }
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [newCampaignMenuOpen])
+
   const handleRowClick = (e: React.MouseEvent, campaign: Campaign) => {
     if ((e.target as HTMLElement).closest('[data-no-list-click]')) return
-    if (campaign.campaign_type === 'ab_test') {
+    if (campaign.campaign_type === 'csv_personalized') {
+      navigate(`/campaigns/${campaign.id}/csv-review`)
+    } else if (campaign.campaign_type === 'ab_test') {
       navigate(`/campaigns/${campaign.id}/ab-test/edit`)
     } else {
       navigate(`/campaigns/${campaign.id}/edit`)
@@ -122,14 +139,35 @@ export function CampaignsPage() {
             <Upload size={16} />
             Import Campaigns
           </Button>
-          <Button variant="secondary" size="md" onClick={() => navigate('/campaigns/ab-test/new')}>
-            <FlaskConical size={16} />
-            New A/B test
-          </Button>
-          <Button variant="primary" size="md" onClick={() => navigate('/campaigns/new')}>
-            <Plus size={16} />
-            New Campaign
-          </Button>
+          <div className="relative" ref={newCampaignMenuRef}>
+            <Button variant="primary" size="md" onClick={() => setNewCampaignMenuOpen(prev => !prev)}>
+              <Plus size={16} />
+              New Campaign
+              <ChevronDown size={14} />
+            </Button>
+            {newCampaignMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 z-20 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 min-w-[200px]">
+                <button
+                  className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => { navigate('/campaigns/new'); setNewCampaignMenuOpen(false) }}
+                >
+                  Standard
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => { navigate('/campaigns/ab-test/new'); setNewCampaignMenuOpen(false) }}
+                >
+                  A/B Test
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => { navigate('/campaigns/new/csv'); setNewCampaignMenuOpen(false) }}
+                >
+                  CSV Personalized
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -206,12 +244,17 @@ export function CampaignsPage() {
                             A/B Test
                           </Badge>
                         )}
+                        {campaign.campaign_type === 'csv_personalized' && (
+                          <Badge className="bg-purple-900/50 text-purple-400">CSV</Badge>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {campaign.contact_list_id
-                        ? (listMap[campaign.contact_list_id] ?? '—')
-                        : '—'}
+                      {campaign.campaign_type === 'csv_personalized'
+                        ? `${campaign.total_recipients ?? 0} recipients`
+                        : campaign.contact_list_id
+                          ? (listMap[campaign.contact_list_id] ?? '—')
+                          : '—'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-400">
                       {campaign.sent_at
@@ -274,20 +317,28 @@ export function CampaignsPage() {
                             onClick={(e) => {
                               e.stopPropagation()
                               setOpenMenuId(null)
-                              navigate(campaign.campaign_type === 'ab_test' ? `/campaigns/${campaign.id}/ab-test/edit` : `/campaigns/${campaign.id}/edit`)
+                              if (campaign.campaign_type === 'csv_personalized') {
+                                navigate(`/campaigns/${campaign.id}/csv-review`)
+                              } else if (campaign.campaign_type === 'ab_test') {
+                                navigate(`/campaigns/${campaign.id}/ab-test/edit`)
+                              } else {
+                                navigate(`/campaigns/${campaign.id}/edit`)
+                              }
                             }}
                           >
-                            Edit
+                            {campaign.campaign_type === 'csv_personalized' ? 'Review' : 'Edit'}
                           </button>
-                          <button
-                            className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDuplicate(campaign.id)
-                            }}
-                          >
-                            Duplicate
-                          </button>
+                          {campaign.campaign_type !== 'csv_personalized' && (
+                            <button
+                              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDuplicate(campaign.id)
+                              }}
+                            >
+                              Duplicate
+                            </button>
+                          )}
                           <button
                             className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700"
                             onClick={(e) => {

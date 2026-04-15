@@ -16,6 +16,7 @@ import { CampaignAnalyticsPage } from './pages/campaigns/CampaignAnalyticsPage'
 import { AbTestBuilderPage } from './pages/campaigns/AbTestBuilderPage'
 import { AbTestResultsPage } from './pages/campaigns/AbTestResultsPage'
 import { CsvUploadPage } from './pages/campaigns/CsvUploadPage'
+import { CsvReviewPage } from './pages/campaigns/CsvReviewPage'
 import { SequencesPage } from './pages/sequences/SequencesPage'
 import { SequenceBuilderPage } from './pages/sequences/SequenceBuilderPage'
 import { SequenceResultsPage } from './pages/sequences/SequenceResultsPage'
@@ -45,6 +46,7 @@ export default function App() {
                 <Route path="/campaigns/new" element={<CampaignBuilderPage />} />
                 <Route path="/campaigns/:id/ab-test/edit" element={<AbTestBuilderPage />} />
                 <Route path="/campaigns/:id/ab-results" element={<AbTestResultsPage />} />
+                <Route path="/campaigns/:id/csv-review" element={<CsvReviewPage />} />
                 <Route path="/campaigns/:id/edit" element={<CampaignBuilderPage />} />
                 <Route path="/campaigns/:id/analytics" element={<CampaignAnalyticsPage />} />
                 <Route path="/sequences" element={<SequencesPage />} />
