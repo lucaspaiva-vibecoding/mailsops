@@ -11,8 +11,8 @@ export function useCsvCampaign() {
   }): Promise<{ data: { campaignId: string; recipientCount: number } | null; error: string | null }> => {
     if (!profile?.workspace_id) return { data: null, error: 'Not authenticated' }
 
-    // Step 1: Application-level upsert contacts by (workspace_id, email)
-    // (No unique constraint on contacts(workspace_id, email) — use select+insert/update pattern)
+    // Step 1: Upsert contacts by (workspace_id, email)
+    // Search ALL contacts including deleted ones to avoid unique constraint violations
     const emails = payload.rows.map(r => r.email.toLowerCase().trim())
 
     const { data: existingContacts, error: fetchError } = await supabase
@@ -20,7 +20,6 @@ export function useCsvCampaign() {
       .select('id, email')
       .eq('workspace_id', profile.workspace_id)
       .in('email', emails)
-      .is('deleted_at', null)
 
     if (fetchError) return { data: null, error: `Contact lookup failed: ${fetchError.message}` }
 
@@ -31,7 +30,7 @@ export function useCsvCampaign() {
 
     const emailToContactId = new Map<string, string>()
 
-    // Update existing contacts (first_name / last_name)
+    // Update existing contacts (first_name / last_name / reactivate if deleted)
     const toUpdate = payload.rows.filter(r => existingByEmail.has(r.email.toLowerCase().trim()))
     for (const row of toUpdate) {
       const email = row.email.toLowerCase().trim()
@@ -39,6 +38,8 @@ export function useCsvCampaign() {
       await supabase.from('contacts').update({
         first_name: row.first_name || null,
         last_name: row.last_name || null,
+        status: 'active',
+        deleted_at: null,
         updated_at: new Date().toISOString(),
       }).eq('id', id)
       emailToContactId.set(email, id)
