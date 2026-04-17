@@ -24,6 +24,7 @@ export function CsvReviewPage() {
   const [scheduledAt, setScheduledAt] = useState('')
   const [timezone, setTimezone] = useState('UTC')
   const [sending, setSending] = useState(false)
+  const [bccInput, setBccInput] = useState('')
 
   useEffect(() => {
     if (!id) return
@@ -68,6 +69,25 @@ export function CsvReviewPage() {
       `Send this campaign to ${recipients.length} recipients? This cannot be undone.`
     )
     if (!confirmed) return
+
+    // Parse and save BCC emails to campaign settings before sending
+    const bccEmails = bccInput
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => e.length > 0)
+
+    if (bccEmails.length > 0) {
+      const { data: currentCampaign } = await supabase
+        .from('campaigns')
+        .select('settings')
+        .eq('id', id)
+        .single()
+      const currentSettings = (currentCampaign?.settings as Record<string, unknown>) ?? {}
+      await supabase
+        .from('campaigns')
+        .update({ settings: { ...currentSettings, bcc_emails: bccEmails } })
+        .eq('id', id)
+    }
 
     setSending(true)
     const { error, sent, total } = await sendCsvCampaign(id)
@@ -175,6 +195,21 @@ export function CsvReviewPage() {
               Delivery
             </h2>
             <Card padding="md">
+              {/* BCC */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  BCC <span className="text-gray-500 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={bccInput}
+                  onChange={e => setBccInput(e.target.value)}
+                  placeholder="email1@exemplo.com, email2@exemplo.com"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">Separate multiple addresses with commas. These recipients will be hidden from each other and from the main recipient.</p>
+              </div>
+
               <SchedulingSection
                 scheduleMode={scheduleMode}
                 onScheduleModeChange={setScheduleMode}
